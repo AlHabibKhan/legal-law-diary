@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicer-xie/tauri/patch-1/tooling/cli/schema.json",
+  "productName": "Legal Law Diary",
+  "version": "1.0.0",
+  "identifier": "com.legallawdiary.desktop",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Legal Law Diary",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  }
+}
