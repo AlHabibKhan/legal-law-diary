@@ -102,6 +102,8 @@ export default function Login() {
         setRegistered(true)
         setAuthenticated(true)
         localStorage.setItem('lawyer_profile', JSON.stringify(fallbackProfile))
+        await checkConnection()
+        db.syncOnLogin().catch(() => {})
         setLoading(false)
         navigate(fallbackProfile.role === 'admin' ? '/admin' : '/dashboard')
         return
@@ -114,6 +116,8 @@ export default function Login() {
         setRegistered(true)
         setAuthenticated(true)
         localStorage.setItem('lawyer_profile', JSON.stringify(fallbackProfile))
+        await checkConnection()
+        db.syncOnLogin().catch(() => {})
         setLoading(false)
         navigate(fallbackProfile.role === 'admin' ? '/admin' : '/dashboard')
         return
@@ -130,6 +134,7 @@ export default function Login() {
 
     await checkConnection()
     await initialize()
+    await db.syncOnLogin()
 
     const { profile, isAuthenticated, isAdmin } = useAuth.getState()
 

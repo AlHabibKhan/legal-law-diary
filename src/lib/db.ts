@@ -30,22 +30,86 @@ export function getConnectionStatus(): boolean {
   return isOnline
 }
 
-function useCloud(enabled: boolean): typeof supabaseDb | typeof localDb {
-  if (enabled && isOnline) return supabaseDb
-  return localDb as unknown as typeof supabaseDb
+async function cacheCases() {
+  if (!isOnline) return
+  try {
+    const data = await supabaseDb.getCases()
+    localDb.replaceCases(data)
+  } catch { /* ignore */ }
+}
+
+async function cacheClients() {
+  if (!isOnline) return
+  try {
+    const data = await supabaseDb.getClients()
+    localDb.replaceClients(data)
+  } catch { /* ignore */ }
+}
+
+async function cacheDiaryEntries() {
+  if (!isOnline) return
+  try {
+    const data = await supabaseDb.getDiaryEntries()
+    localDb.replaceDiaryEntries(data)
+  } catch { /* ignore */ }
+}
+
+async function cacheProceedings() {
+  if (!isOnline) return
+  try {
+    const allCases = await supabaseDb.getCases()
+    const all: Proceeding[] = []
+    for (const c of allCases) {
+      const p = await supabaseDb.getProceedings(c.id).catch(() => [] as Proceeding[])
+      all.push(...p)
+    }
+    localDb.replaceProceedings(all)
+  } catch { /* ignore */ }
+}
+
+async function cacheParties() {
+  if (!isOnline) return
+  try {
+    const allCases = await supabaseDb.getCases()
+    const all: CaseParty[] = []
+    for (const c of allCases) {
+      const p = await supabaseDb.getCaseParties(c.id).catch(() => [] as CaseParty[])
+      all.push(...p)
+    }
+    localDb.replaceParties(all)
+  } catch { /* ignore */ }
+}
+
+async function cacheDocuments() {
+  if (!isOnline) return
+  try {
+    const allCases = await supabaseDb.getCases()
+    const all: Document[] = []
+    for (const c of allCases) {
+      const d = await supabaseDb.getCaseDocuments(c.id).catch(() => [] as Document[])
+      all.push(...d)
+    }
+    localDb.replaceDocuments(all)
+  } catch { /* ignore */ }
 }
 
 export const db = {
   async registerLawyer(profile: LawyerProfile): Promise<string> {
-    if (isOnline) {
-      try { return await supabaseDb.registerLawyer(profile) } catch { /* fall through */ }
-    }
+    try {
+      return await supabaseDb.registerLawyer(profile)
+    } catch { /* fall through */ }
     return localDb.registerLawyer(profile)
   },
 
   async getLawyerProfile(): Promise<LawyerProfile | null> {
     if (isOnline) {
-      try { return await supabaseDb.getLawyerProfile() } catch { /* fall through */ }
+      try {
+        const p = await supabaseDb.getLawyerProfile()
+        if (p) {
+          localDb.registerLawyer(p)
+          return p
+        }
+      } catch { /* fall through */ }
     }
     return localDb.getLawyerProfile()
   },
@@ -82,14 +146,22 @@ export const db = {
 
   async getCases(status?: string): Promise<Case[]> {
     if (isOnline) {
-      try { return await supabaseDb.getCases(status) } catch { /* fall through */ }
+      try {
+        const data = await supabaseDb.getCases(status)
+        localDb.replaceCases(data)
+        return data
+      } catch { /* fall through */ }
     }
     return localDb.getCases(status)
   },
 
   async createCase(caseData: Case): Promise<string> {
     if (isOnline) {
-      try { return await supabaseDb.createCase(caseData) } catch { /* fall through */ }
+      try {
+        const id = await supabaseDb.createCase(caseData)
+        localDb.createCase({ ...caseData, id })
+        return id
+      } catch { /* fall through */ }
     }
     return localDb.createCase(caseData)
   },
@@ -103,14 +175,18 @@ export const db = {
 
   async updateCase(caseData: Case): Promise<void> {
     if (isOnline) {
-      try { await supabaseDb.updateCase(caseData); return } catch { /* fall through */ }
+      try { await supabaseDb.updateCase(caseData) } catch { /* fall through */ }
     }
     return localDb.updateCase(caseData)
   },
 
   async getClients(): Promise<Client[]> {
     if (isOnline) {
-      try { return await supabaseDb.getClients() } catch { /* fall through */ }
+      try {
+        const data = await supabaseDb.getClients()
+        localDb.replaceClients(data)
+        return data
+      } catch { /* fall through */ }
     }
     return localDb.getClients()
   },
@@ -131,7 +207,11 @@ export const db = {
 
   async getDiaryEntries(date?: string): Promise<DiaryEntry[]> {
     if (isOnline) {
-      try { return await supabaseDb.getDiaryEntries(date) } catch { /* fall through */ }
+      try {
+        const data = await supabaseDb.getDiaryEntries(date)
+        localDb.replaceDiaryEntries(data)
+        return data
+      } catch { /* fall through */ }
     }
     return localDb.getDiaryEntries(date)
   },
@@ -152,14 +232,18 @@ export const db = {
 
   async createDiaryEntry(entry: DiaryEntry): Promise<string> {
     if (isOnline) {
-      try { return await supabaseDb.createDiaryEntry(entry) } catch { /* fall through */ }
+      try {
+        const id = await supabaseDb.createDiaryEntry(entry)
+        localDb.createDiaryEntry({ ...entry, id })
+        return id
+      } catch { /* fall through */ }
     }
     return localDb.createDiaryEntry(entry)
   },
 
   async updateDiaryEntry(entry: DiaryEntry): Promise<void> {
     if (isOnline) {
-      try { await supabaseDb.updateDiaryEntry(entry); return } catch { /* fall through */ }
+      try { await supabaseDb.updateDiaryEntry(entry) } catch { /* fall through */ }
     }
     return localDb.updateDiaryEntry(entry)
   },
@@ -173,7 +257,11 @@ export const db = {
 
   async createProceeding(data: Proceeding): Promise<string> {
     if (isOnline) {
-      try { return await supabaseDb.createProceeding(data) } catch { /* fall through */ }
+      try {
+        const id = await supabaseDb.createProceeding(data)
+        localDb.createProceeding({ ...data, id })
+        return id
+      } catch { /* fall through */ }
     }
     return localDb.createProceeding(data)
   },
@@ -194,7 +282,11 @@ export const db = {
 
   async addCaseParty(data: CaseParty): Promise<string> {
     if (isOnline) {
-      try { return await supabaseDb.addCaseParty(data) } catch { /* fall through */ }
+      try {
+        const id = await supabaseDb.addCaseParty(data)
+        localDb.addCaseParty({ ...data, id })
+        return id
+      } catch { /* fall through */ }
     }
     return localDb.addCaseParty(data)
   },
@@ -215,7 +307,11 @@ export const db = {
 
   async saveDocument(data: Document): Promise<string> {
     if (isOnline) {
-      try { return await supabaseDb.saveDocument(data) } catch { /* fall through */ }
+      try {
+        const id = await supabaseDb.saveDocument(data)
+        localDb.saveDocument({ ...data, id })
+        return id
+      } catch { /* fall through */ }
     }
     return localDb.saveDocument(data)
   },
@@ -250,5 +346,40 @@ export const db = {
 
   async getProfileByPhone(phone: string): Promise<LawyerProfile | null> {
     return localDb.getProfileByPhone(phone)
+  },
+
+  replaceAll(data: {
+    cases?: Case[]
+    clients?: Client[]
+    diary_entries?: DiaryEntry[]
+    proceedings?: Proceeding[]
+    parties?: CaseParty[]
+    documents?: Document[]
+  }): void {
+    localDb.replaceAll(data)
+  },
+
+  async syncOnLogin(): Promise<void> {
+    if (!isOnline) return
+
+    // Sync profile
+    try {
+      const profile = await supabaseDb.getLawyerProfile()
+      if (profile) {
+        localDb.registerLawyer(profile)
+        localStorage.setItem('lawyer_profile', JSON.stringify(profile))
+        localStorage.setItem('is_registered', 'true')
+      }
+    } catch { /* ignore */ }
+
+    // Sync all collections in parallel
+    await Promise.all([
+      cacheCases(),
+      cacheClients(),
+      cacheDiaryEntries(),
+      cacheProceedings(),
+      cacheParties(),
+      cacheDocuments(),
+    ])
   },
 }

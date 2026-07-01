@@ -263,6 +263,31 @@ export const localDb = {
     return allCases.filter((c) => caseIds.includes(c.id))
   },
 
+  // ===== Batch Replace (for cloud sync) =====
+
+  replaceCases(cases: Case[]): void { saveCollection('cases', cases) },
+  replaceClients(clients: Client[]): void { saveCollection('clients', clients) },
+  replaceDiaryEntries(entries: DiaryEntry[]): void { saveCollection('diary_entries', entries) },
+  replaceProceedings(proceedings: Proceeding[]): void { saveCollection('proceedings', proceedings) },
+  replaceParties(parties: CaseParty[]): void { saveCollection('parties', parties) },
+  replaceDocuments(docs: Document[]): void { saveCollection('documents', docs) },
+
+  replaceAll(data: {
+    cases?: Case[]
+    clients?: Client[]
+    diary_entries?: DiaryEntry[]
+    proceedings?: Proceeding[]
+    parties?: CaseParty[]
+    documents?: Document[]
+  }): void {
+    if (data.cases) this.replaceCases(data.cases)
+    if (data.clients) this.replaceClients(data.clients)
+    if (data.diary_entries) this.replaceDiaryEntries(data.diary_entries)
+    if (data.proceedings) this.replaceProceedings(data.proceedings)
+    if (data.parties) this.replaceParties(data.parties)
+    if (data.documents) this.replaceDocuments(data.documents)
+  },
+
   // ===== Dashboard =====
 
   async getDashboardStats(): Promise<DashboardStats> {

@@ -197,6 +197,7 @@ export default function Register() {
       localStorage.setItem('is_registered', 'true')
       setRegistered(true)
       setAuthenticated(true)
+      db.syncOnLogin().catch(() => {})
     } catch (err) {
       console.error(err)
     }

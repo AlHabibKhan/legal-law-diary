@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { supabase } from '@/lib/supabase'
-import { checkConnection } from '@/lib/db'
+import { checkConnection, db } from '@/lib/db'
 import type { LawyerProfile } from '@/types'
 
 interface AuthState {
@@ -102,6 +102,8 @@ export const useAuth = create<AuthState>((set) => ({
           ? Math.max(0, Math.ceil((new Date(profile.trial_ends_at).getTime() - Date.now()) / 86400000))
           : null,
       })
+      // Refresh local cache from cloud (non-blocking)
+      db.syncOnLogin().catch(() => {})
     } else {
       const storedProfile = localStorage.getItem('lawyer_profile') || localStorage.getItem('ld:lawyer_profile')
       if (storedProfile) {
