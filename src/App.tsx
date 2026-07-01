@@ -76,6 +76,8 @@ export default function App() {
         {/* Public utility pages */}
         <Route path="/legal" element={<Legal />} />
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/tools" element={<Tools />} />
+        <Route path="/limitation-calculator" element={<Navigate to="/tools" replace />} />
         <Route path="/subscribe/:planId" element={<Subscribe />} />
         <Route path="/payment-status" element={<PaymentStatus />} />
 
@@ -110,8 +112,6 @@ export default function App() {
           <Route path="/clients/new" element={<SubscriptionGuard><NewClient /></SubscriptionGuard>} />
           <Route path="/clients/:id" element={<SubscriptionGuard><ClientDetail /></SubscriptionGuard>} />
           <Route path="/courts" element={<SubscriptionGuard><Courts /></SubscriptionGuard>} />
-          <Route path="/tools" element={<SubscriptionGuard><Tools /></SubscriptionGuard>} />
-          <Route path="/limitation-calculator" element={<Navigate to="/tools" replace />} />
           <Route path="/settings" element={<SubscriptionGuard><Settings /></SubscriptionGuard>} />
         </Route>
 
