@@ -119,8 +119,8 @@ export default function Login() {
         </div>
 
         {/* Role Tabs */}
-        <div className="grid grid-cols-3 gap-2">
-          {(Object.entries(roleConfig) as [LoginRole, typeof config][]).map(([key, cfg]) => {
+        <div className="grid grid-cols-2 gap-2">
+          {(Object.entries(roleConfig) as [LoginRole, typeof config][]).filter(([key]) => key !== 'admin' || loginRole === 'admin').map(([key, cfg]) => {
             const Icon = cfg.icon
             const isActive = loginRole === key
             return (
@@ -209,6 +209,18 @@ export default function Login() {
           New here?{' '}
           <Link to="/register" className="font-medium text-blue-600 hover:underline">Create an account</Link>
         </p>
+
+        {loginRole !== 'admin' && (
+          <p className="text-center text-xs text-slate-400">
+            <button
+              type="button"
+              onClick={() => { setLoginRole('admin'); setEmail(''); setPassword(''); setError('') }}
+              className="text-slate-300 hover:text-amber-500 transition-colors"
+            >
+              Super Admin?
+            </button>
+          </p>
+        )}
       </div>
     </div>
   )

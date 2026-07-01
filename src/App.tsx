@@ -32,6 +32,7 @@ import AdminPlans from '@/pages/admin/AdminPlans'
 import AdminFirms from '@/pages/admin/AdminFirms'
 import AdminPaymentMethods from '@/pages/admin/AdminPaymentMethods'
 import AdminPaymentRequests from '@/pages/admin/AdminPaymentRequests'
+import AdminBackup from '@/pages/admin/AdminBackup'
 import { Loader2 } from 'lucide-react'
 
 export default function App() {
@@ -93,6 +94,7 @@ export default function App() {
           <Route path="firms" element={<AdminFirms />} />
           <Route path="payment-methods" element={<AdminPaymentMethods />} />
           <Route path="payment-requests" element={<AdminPaymentRequests />} />
+          <Route path="backup" element={<AdminBackup />} />
         </Route>
 
         {/* App Routes */}

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Scale, User, Building2, Shield, ArrowRight, Lock } from 'lucide-react'
+import { Scale, User, Building2, ArrowRight, Lock } from 'lucide-react'
 
 const roles = [
   {
@@ -19,15 +19,6 @@ const roles = [
     color: 'border-purple-200 hover:border-purple-400',
     iconBg: 'bg-purple-50 text-purple-600',
     btnColor: 'bg-purple-600 hover:bg-purple-700',
-  },
-  {
-    key: 'admin',
-    icon: Shield,
-    label: 'Super Admin',
-    description: 'Platform administration & user management',
-    color: 'border-amber-200 hover:border-amber-400',
-    iconBg: 'bg-amber-50 text-amber-600',
-    btnColor: 'bg-amber-600 hover:bg-amber-700',
   },
 ]
 
@@ -49,7 +40,7 @@ export default function Landing() {
         </div>
 
         {/* Role Cards */}
-        <div className="grid w-full gap-5 sm:grid-cols-3">
+        <div className="grid w-full gap-5 sm:grid-cols-2">
           {roles.map((r) => {
             const Icon = r.icon
             return (

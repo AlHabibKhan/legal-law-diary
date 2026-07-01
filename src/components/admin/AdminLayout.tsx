@@ -6,6 +6,7 @@ import {
   CreditCard,
   FileText,
   Building2,
+  Download,
   Scale,
   ArrowLeft,
 } from 'lucide-react'
@@ -18,6 +19,7 @@ const navItems = [
   { to: '/admin/firms', icon: Building2, label: 'Law Firms' },
   { to: '/admin/payment-methods', icon: CreditCard, label: 'Payment Methods' },
   { to: '/admin/payment-requests', icon: FileText, label: 'Payment Requests' },
+  { to: '/admin/backup', icon: Download, label: 'Backup' },
 ]
 
 export function AdminLayout() {
