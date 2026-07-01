@@ -49,10 +49,12 @@ export default function Settings() {
   const [showPasswordSection, setShowPasswordSection] = useState(false)
   const [passwordError, setPasswordError] = useState('')
   const [passwordLoading, setPasswordLoading] = useState(false)
+  const [hasSession, setHasSession] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     checkConnection().then(setOnline)
+    supabase.auth.getSession().then(({ data }) => setHasSession(!!data.session))
   }, [])
 
   function updateField(key: string, value: string) {
@@ -394,13 +396,15 @@ export default function Settings() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {showPasswordSection ? (
+          {!hasSession ? (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+              <div className="flex items-start gap-2">
+                <CloudOff className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                <p>You're using offline/local mode. Sign in with your cloud account to change your password.</p>
+              </div>
+            </div>
+          ) : showPasswordSection ? (
             <>
-              <PasswordInput
-                label="Current Password"
-                value={passwordForm.current}
-                onChange={(e) => setPasswordForm((p) => ({ ...p, current: e.target.value }))}
-              />
               <PasswordInput
                 label="New Password"
                 placeholder="Minimum 6 characters"

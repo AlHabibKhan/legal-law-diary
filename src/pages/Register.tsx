@@ -142,6 +142,9 @@ export default function Register() {
         password,
       })
 
+      // Sign in immediately to establish the real Supabase session
+      await supabase.auth.signInWithPassword({ email: email.trim(), password }).catch(() => {})
+
       const userId = authData?.user?.id || generateId()
 
       if (registerRole === 'individual') {

@@ -53,6 +53,8 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [resending, setResending] = useState(false)
+  const [resendSent, setResendSent] = useState(false)
   const navigate = useNavigate()
 
   const config = roleConfig[loginRole]
@@ -82,7 +84,7 @@ export default function Login() {
     if (signInError) {
       const storedProfile = localStorage.getItem('lawyer_profile')
 
-      if (storedProfile) {
+      if (storedProfile && signInError.message !== 'Email not confirmed') {
         try {
           const profile = JSON.parse(storedProfile) as LawyerProfile
           setProfile(profile)
@@ -97,11 +99,15 @@ export default function Login() {
         }
       }
 
-      setError(
-        signInError.message === 'Failed to fetch'
-          ? 'Cannot connect to server. Try again later.'
-          : signInError.message,
-      )
+      if (signInError.message === 'Email not confirmed') {
+        setError('Please confirm your email address before signing in. Check your inbox (and spam/junk folder).')
+      } else {
+        setError(
+          signInError.message === 'Failed to fetch'
+            ? 'Cannot connect to server. Try again later.'
+            : signInError.message,
+        )
+      }
       setLoading(false)
       return
     }
@@ -204,6 +210,29 @@ export default function Login() {
 
           {error && (
             <p className="text-sm text-red-600">{error}</p>
+          )}
+          {error.includes('confirm your email') && !resendSent && (
+            <button
+              type="button"
+              onClick={async () => {
+                setResending(true)
+                const { error: resendError } = await supabase.auth.resend({
+                  type: 'signup',
+                  email: email.trim(),
+                })
+                setResending(false)
+                if (resendError) {
+                  setError(resendError.message)
+                } else {
+                  setResendSent(true)
+                  setError('Confirmation email resent! Please check your inbox (and spam).')
+                }
+              }}
+              disabled={resending}
+              className="w-full text-center text-xs text-blue-600 hover:underline"
+            >
+              {resending ? 'Resending...' : 'Resend confirmation email'}
+            </button>
           )}
 
           <Button type="submit" className="w-full" disabled={loading}>
