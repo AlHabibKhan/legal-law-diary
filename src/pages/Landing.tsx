@@ -1,20 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import {
-  Scale, User, Building2, ArrowRight, Lock,
-  BookOpen, CalendarCheck, Users, FileText, Gavel, BarChart3, ShieldCheck,
-} from 'lucide-react'
+import { Scale, User, Building2, ArrowRight, Lock } from 'lucide-react'
 import { AdBanner } from '@/components/ads/AdBanner'
-
-const features = [
-  { icon: BookOpen, title: 'Case Management', desc: 'Organize and track all your legal cases in one place' },
-  { icon: CalendarCheck, title: 'Hearing Diary', desc: 'Never miss a court date with scheduled reminders' },
-  { icon: Users, title: 'Client Directory', desc: 'Maintain detailed records of all your clients' },
-  { icon: FileText, title: 'Document Storage', desc: 'Attach and manage case documents securely' },
-  { icon: Gavel, title: 'Proceedings Log', desc: 'Record and review every court proceeding' },
-  { icon: BarChart3, title: 'Dashboard Insights', desc: 'Get real-time stats on your practice performance' },
-  { icon: ShieldCheck, title: 'Cloud Sync', desc: 'Access your data from any device, anywhere' },
-  { icon: Lock, title: 'Secure & Encrypted', desc: 'Your data is protected at rest and in transit' },
-]
 
 const roles = [
   {
@@ -54,27 +40,7 @@ export default function Landing() {
           </p>
         </div>
 
-        {/* Benefits */}
-        <div className="w-full">
-          <h2 className="mb-6 text-center text-xl font-bold text-slate-900">Everything you need to run your practice</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {features.map((f) => {
-              const Icon = f.icon
-              return (
-                <div
-                  key={f.title}
-                  className="rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm transition-shadow hover:shadow-md"
-                >
-                  <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="mt-3 text-sm font-bold text-slate-900">{f.title}</h3>
-                  <p className="mt-1 text-xs text-slate-500">{f.desc}</p>
-                </div>
-              )
-            })}
-          </div>
-        </div>
+        <AdBanner adKey="LANDING_MID" height={90} width={728} className="w-full max-w-2xl mx-auto" />
 
         {/* Role Cards */}
         <div className="grid w-full gap-5 sm:grid-cols-2">
