@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Scale, User, Building2, ArrowRight, Lock,
   BookOpen, CalendarCheck, Users, FileText, Gavel, BarChart3, ShieldCheck,
@@ -91,12 +91,12 @@ export default function Landing() {
                 Limitation · Court Fee · Interest on Decree · Date Math · Case Age
               </p>
             </div>
-            <button
-              onClick={() => navigate('/tools')}
+            <Link
+              to="/tools"
               className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-50"
             >
               Explore Tools <ArrowRight className="h-4 w-4" />
-            </button>
+            </Link>
           </div>
         </div>
 
