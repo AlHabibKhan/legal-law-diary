@@ -35,6 +35,7 @@ export default function Settings() {
     bar_council: profile?.bar_council ?? 'PBC',
     license_number: profile?.license_number ?? '',
     mobile_number: profile?.mobile_number ?? '',
+    cnic: profile?.cnic ?? '',
     chamber_address: profile?.chamber_address ?? '',
     practice_areas: profile?.practice_areas ?? '',
   })
@@ -308,6 +309,11 @@ export default function Settings() {
                 error={errors.mobile_number}
               />
               <Input
+                label="CNIC / ID Card Number"
+                value={form.cnic}
+                onChange={(e) => updateField('cnic', e.target.value)}
+              />
+              <Input
                 label="Chamber Address"
                 value={form.chamber_address}
                 onChange={(e) => updateField('chamber_address', e.target.value)}
@@ -350,6 +356,14 @@ export default function Settings() {
                     {profile?.mobile_number}
                   </p>
                 </div>
+                {profile?.cnic && (
+                  <div>
+                    <p className="text-xs text-slate-500">CNIC</p>
+                    <p className="text-sm font-medium text-slate-900">
+                      {profile.cnic}
+                    </p>
+                  </div>
+                )}
                 {profile?.chamber_address && (
                   <div className="col-span-2">
                     <p className="text-xs text-slate-500">Chamber</p>

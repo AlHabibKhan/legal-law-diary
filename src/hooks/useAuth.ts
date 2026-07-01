@@ -81,6 +81,7 @@ export const useAuth = create<AuthState>((set) => ({
         bar_council: profile.bar_council,
         license_number: profile.license_number,
         mobile_number: profile.mobile_number,
+        cnic: profile.cnic,
         chamber_address: profile.chamber_address,
         practice_areas: profile.practice_areas,
         role: profile.role,

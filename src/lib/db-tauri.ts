@@ -28,9 +28,9 @@ export const tauriDb = {
   async registerLawyer(profile: LawyerProfile): Promise<string> {
     const d = await db()
     await d.execute(
-      `INSERT INTO lawyer_profile (id, full_name, bar_council, license_number, mobile_number, chamber_address, practice_areas)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [profile.id, profile.full_name, profile.bar_council, profile.license_number, profile.mobile_number, profile.chamber_address ?? '', profile.practice_areas ?? '']
+      `INSERT INTO lawyer_profile (id, full_name, bar_council, license_number, mobile_number, cnic, chamber_address, practice_areas)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+      [profile.id, profile.full_name, profile.bar_council, profile.license_number, profile.mobile_number, profile.cnic ?? '', profile.chamber_address ?? '', profile.practice_areas ?? '']
     )
     await d.execute("INSERT OR REPLACE INTO app_settings (key, value) VALUES ('is_registered', 'true')", [])
     return profile.id
@@ -39,7 +39,7 @@ export const tauriDb = {
   async getLawyerProfile(): Promise<LawyerProfile | null> {
     const d = await db()
     const rows = await d.select<Record<string, unknown>[]>(
-      'SELECT id, full_name, bar_council, license_number, mobile_number, chamber_address, practice_areas FROM lawyer_profile LIMIT 1'
+      'SELECT id, full_name, bar_council, license_number, mobile_number, cnic, chamber_address, practice_areas FROM lawyer_profile LIMIT 1'
     )
     if (rows.length === 0) return null
     const r = rows[0]
@@ -49,6 +49,7 @@ export const tauriDb = {
       bar_council: r.bar_council as string,
       license_number: r.license_number as string,
       mobile_number: r.mobile_number as string,
+      cnic: (r.cnic as string) || null,
       chamber_address: (r.chamber_address as string) || null,
       practice_areas: (r.practice_areas as string) || null,
     }
@@ -57,8 +58,8 @@ export const tauriDb = {
   async updateLawyerProfile(profile: LawyerProfile): Promise<void> {
     const d = await db()
     await d.execute(
-      `UPDATE lawyer_profile SET full_name=$1, bar_council=$2, license_number=$3, mobile_number=$4, chamber_address=$5, practice_areas=$6, updated_at=datetime('now') WHERE id=$7`,
-      [profile.full_name, profile.bar_council, profile.license_number, profile.mobile_number, profile.chamber_address ?? '', profile.practice_areas ?? '', profile.id]
+      `UPDATE lawyer_profile SET full_name=$1, bar_council=$2, license_number=$3, mobile_number=$4, cnic=$5, chamber_address=$6, practice_areas=$7, updated_at=datetime('now') WHERE id=$8`,
+      [profile.full_name, profile.bar_council, profile.license_number, profile.mobile_number, profile.cnic ?? '', profile.chamber_address ?? '', profile.practice_areas ?? '', profile.id]
     )
   },
 

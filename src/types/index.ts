@@ -4,6 +4,7 @@ export interface LawyerProfile {
   bar_council: string
   license_number: string
   mobile_number: string
+  cnic: string | null
   chamber_address: string | null
   practice_areas: string | null
   role?: 'lawyer' | 'admin' | 'firm_admin'

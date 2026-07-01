@@ -26,6 +26,7 @@ export const supabaseDb = {
       bar_council: profile.bar_council,
       license_number: profile.license_number,
       mobile_number: profile.mobile_number,
+      cnic: profile.cnic,
       chamber_address: profile.chamber_address,
       practice_areas: profile.practice_areas,
     })
@@ -50,6 +51,7 @@ export const supabaseDb = {
       bar_council: data.bar_council,
       license_number: data.license_number,
       mobile_number: data.mobile_number,
+      cnic: data.cnic,
       chamber_address: data.chamber_address,
       practice_areas: data.practice_areas,
     }
@@ -63,6 +65,7 @@ export const supabaseDb = {
         bar_council: profile.bar_council,
         license_number: profile.license_number,
         mobile_number: profile.mobile_number,
+        cnic: profile.cnic,
         chamber_address: profile.chamber_address,
         practice_areas: profile.practice_areas,
       })

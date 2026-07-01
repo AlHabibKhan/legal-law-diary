@@ -80,6 +80,7 @@ export default function Register() {
     bar_council: 'PBC',
     license_number: '',
     mobile_number: '',
+    cnic: '',
     chamber_address: '',
     practice_areas: '',
   })
@@ -90,6 +91,7 @@ export default function Register() {
     firm_address: '',
     your_name: '',
     your_mobile: '',
+    firm_cnic: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
@@ -167,6 +169,7 @@ export default function Register() {
         const profile: LawyerProfile = {
           id: userId,
           ...form,
+          cnic: form.cnic || null,
           chamber_address: form.chamber_address || null,
           practice_areas: form.practice_areas || null,
         }
@@ -183,6 +186,7 @@ export default function Register() {
           bar_council: 'PBC',
           license_number: '',
           mobile_number: firmForm.your_mobile,
+          cnic: firmForm.firm_cnic || null,
           chamber_address: firmForm.firm_address || null,
           practice_areas: null,
         }
@@ -243,6 +247,14 @@ export default function Register() {
             value={form.mobile_number}
             onChange={(e) => updateField('mobile_number', e.target.value)}
             error={errors.mobile_number}
+          />
+
+          <Input
+            id="cnic"
+            label="CNIC / ID Card Number"
+            placeholder="xxxxx-xxxxxxx-x"
+            value={form.cnic}
+            onChange={(e) => updateField('cnic', e.target.value)}
           />
 
           <Input
@@ -327,6 +339,14 @@ export default function Register() {
             value={firmForm.your_mobile}
             onChange={(e) => updateFirmField('your_mobile', e.target.value)}
             error={errors.your_mobile}
+          />
+
+          <Input
+            id="firm_cnic"
+            label="Your CNIC / ID Card Number"
+            placeholder="xxxxx-xxxxxxx-x"
+            value={firmForm.firm_cnic || ''}
+            onChange={(e) => updateFirmField('firm_cnic', e.target.value)}
           />
         </div>
 
