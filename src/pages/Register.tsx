@@ -34,36 +34,14 @@ import type { LawyerProfile } from '@/types'
 type RegisterRole = 'individual' | 'firm'
 
 const features = [
-  {
-    icon: Users,
-    title: 'Client Directory',
-    desc: 'Maintain detailed records of your clients',
-  },
-  {
-    icon: FileText,
-    title: 'Document Storage',
-    desc: 'Attach and manage case documents securely',
-  },
-  {
-    icon: Gavel,
-    title: 'Proceedings Log',
-    desc: 'Record and review every court proceeding',
-  },
-  {
-    icon: BarChart3,
-    title: 'Dashboard Insights',
-    desc: 'Get real-time stats on your practice',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Cloud Sync',
-    desc: 'Access your data from any device',
-  },
-  {
-    icon: Lock,
-    title: 'Secure & Encrypted',
-    desc: 'Your data is safe with Supabase Auth',
-  },
+  { icon: BookOpen, title: 'Case Management', desc: 'Organize and track all your legal cases in one place' },
+  { icon: CalendarCheck, title: 'Hearing Diary', desc: 'Never miss a court date with scheduled reminders' },
+  { icon: Users, title: 'Client Directory', desc: 'Maintain detailed records of all your clients' },
+  { icon: FileText, title: 'Document Storage', desc: 'Attach and manage case documents securely' },
+  { icon: Gavel, title: 'Proceedings Log', desc: 'Record and review every court proceeding' },
+  { icon: BarChart3, title: 'Dashboard Insights', desc: 'Get real-time stats on your practice performance' },
+  { icon: ShieldCheck, title: 'Cloud Sync', desc: 'Access your data from any device, anywhere' },
+  { icon: Lock, title: 'Secure & Encrypted', desc: 'Your data is protected at rest and in transit' },
 ]
 
 export default function Register() {
@@ -399,21 +377,17 @@ export default function Register() {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-center">
-            <BookOpen className="mx-auto h-8 w-8 text-blue-600" />
-            <h3 className="mt-2 text-sm font-bold text-slate-900">Case Management</h3>
-            <p className="mt-0.5 text-xs text-slate-500">
-              Organize and track all your legal cases in one place
-            </p>
-          </div>
-          <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-center">
-            <CalendarCheck className="mx-auto h-8 w-8 text-blue-600" />
-            <h3 className="mt-2 text-sm font-bold text-slate-900">Hearing Diary</h3>
-            <p className="mt-0.5 text-xs text-slate-500">
-              Never miss a court date with scheduled reminders
-            </p>
-          </div>
+        <div className="grid grid-cols-4 gap-2">
+          {features.map((f) => (
+            <div
+              key={f.title}
+              className="rounded-lg border border-blue-100 bg-blue-50/60 p-2.5 text-center"
+            >
+              <f.icon className="mx-auto h-5 w-5 text-blue-600" />
+              <p className="mt-1 text-[11px] font-semibold text-slate-900 leading-tight">{f.title}</p>
+              <p className="mt-0.5 text-[10px] text-slate-500 leading-tight">{f.desc}</p>
+            </div>
+          ))}
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -506,22 +480,6 @@ export default function Register() {
             </div>
           )}
         </div>
-
-        <div className="grid grid-cols-3 gap-2">
-          {features.map((f) => (
-            <div
-              key={f.title}
-              className="rounded-lg border border-slate-200 bg-white p-3 text-center shadow-sm"
-            >
-              <f.icon className="mx-auto h-5 w-5 text-blue-600" />
-              <p className="mt-1 text-xs font-medium text-slate-900">{f.title}</p>
-            </div>
-          ))}
-        </div>
-
-        <p className="text-center text-xs text-slate-400">
-          Your data is encrypted and securely stored in the cloud
-        </p>
 
         <AdBanner adKey="REGISTER_BANNER" height={250} width={300} className="mx-auto" />
 
