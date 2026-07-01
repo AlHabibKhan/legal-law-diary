@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useSearchParams, Link } from 'react-router-dom'
+import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
@@ -20,6 +20,8 @@ import {
   Building2,
   User,
   ArrowRight,
+  Smartphone,
+  Mail,
 } from 'lucide-react'
 import { BAR_COUNCILS } from '@/types'
 import { db } from '@/lib/db'
@@ -47,10 +49,13 @@ const features = [
 export default function Register() {
   const { setProfile, setRegistered, setAuthenticated, initialize } = useAuth()
   const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
   const defaultRole = (searchParams.get('role') as RegisterRole) || 'individual'
   const [registerRole, setRegisterRole] = useState<RegisterRole>(defaultRole)
   const [step, setStep] = useState(1)
+  const [authMethod, setAuthMethod] = useState<'email' | 'phone'>('email')
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [pin, setPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
@@ -109,7 +114,11 @@ export default function Register() {
 
   function validateStep2(): boolean {
     const e: Record<string, string> = {}
-    if (!email.trim()) e.email = 'Email is required'
+    if (authMethod === 'email') {
+      if (!email.trim()) e.email = 'Email is required'
+    } else {
+      if (!phone.trim()) e.email = 'Phone number is required'
+    }
     if (password.length < 6) e.password = 'Password must be at least 6 characters'
     setErrors(e)
     return Object.keys(e).length === 0
@@ -137,13 +146,14 @@ export default function Register() {
 
     try {
       await checkConnection()
+      const authIdentifier = authMethod === 'email' ? { email: email.trim() } : { phone: phone.trim() }
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email.trim(),
+        ...authIdentifier,
         password,
       })
 
       // Sign in immediately to establish the real Supabase session
-      await supabase.auth.signInWithPassword({ email: email.trim(), password }).catch(() => {})
+      await supabase.auth.signInWithPassword({ ...authIdentifier, password }).catch(() => {})
 
       const userId = authData?.user?.id || generateId()
       let profile: LawyerProfile
@@ -182,6 +192,7 @@ export default function Register() {
       }
 
       db.setPin(pin)
+      localStorage.setItem('app_password', password)
       localStorage.setItem('lawyer_profile', JSON.stringify(profile))
       localStorage.setItem('is_registered', 'true')
       setRegistered(true)
@@ -395,15 +406,47 @@ export default function Register() {
                 Create your cloud account to sync data across devices.
               </p>
 
-              <Input
-                id="email"
-                label="Email Address"
-                type="email"
-                placeholder="lawyer@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                error={errors.email}
-              />
+              <div className="flex rounded-lg border border-slate-200 bg-slate-100 p-0.5">
+                <button
+                  type="button"
+                  onClick={() => { setAuthMethod('email'); setErrors({}) }}
+                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+                    authMethod === 'email' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  <Mail size={14} /> Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAuthMethod('phone'); setErrors({}) }}
+                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+                    authMethod === 'phone' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  <Smartphone size={14} /> Phone
+                </button>
+              </div>
+
+              {authMethod === 'email' ? (
+                <Input
+                  id="email"
+                  label="Email Address"
+                  type="email"
+                  placeholder="lawyer@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  error={errors.email}
+                />
+              ) : (
+                <Input
+                  id="phone"
+                  label="Mobile Number"
+                  type="tel"
+                  placeholder={form.mobile_number || 'e.g. 0300-1234567'}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              )}
 
               <PasswordInput
                 id="password"

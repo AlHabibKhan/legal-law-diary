@@ -247,4 +247,8 @@ export const db = {
     }
     return localDb.getDashboardStats()
   },
+
+  async getProfileByPhone(phone: string): Promise<LawyerProfile | null> {
+    return localDb.getProfileByPhone(phone)
+  },
 }

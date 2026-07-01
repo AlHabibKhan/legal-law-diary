@@ -2,13 +2,13 @@ import { useState } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
-import { checkConnection } from '@/lib/db'
+import { checkConnection, db } from '@/lib/db'
 import type { LawyerProfile } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { AdBanner } from '@/components/ads/AdBanner'
-import { Scale, Lock, LogIn, User, Building2, Shield, ArrowRight } from 'lucide-react'
+import { Scale, Lock, LogIn, User, Building2, Shield, Smartphone, Mail } from 'lucide-react'
 
 type LoginRole = 'individual' | 'firm' | 'admin'
 
@@ -49,7 +49,9 @@ export default function Login() {
   const [searchParams] = useSearchParams()
   const defaultRole = (searchParams.get('role') as LoginRole) || 'individual'
   const [loginRole, setLoginRole] = useState<LoginRole>(defaultRole)
+  const [authMethod, setAuthMethod] = useState<'email' | 'phone'>('email')
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -76,53 +78,50 @@ export default function Login() {
     setError('')
     setLoading(true)
 
+    const identifier = authMethod === 'email' ? { email: email.trim() } : { phone: phone.trim() }
     const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+      ...identifier,
       password,
     })
 
     if (signInError) {
-      const storedProfile = localStorage.getItem('lawyer_profile') || localStorage.getItem('ld:lawyer_profile')
+      // Try localStorage fallback
+      let fallbackProfile: LawyerProfile | null = null
 
-      if (storedProfile && signInError.message !== 'Email not confirmed') {
-        try {
-          const profile = JSON.parse(storedProfile) as LawyerProfile
-          setProfile(profile)
-          setRegistered(true)
-          setAuthenticated(true)
-          // ensure bare key exists for future lookups
-          localStorage.setItem('lawyer_profile', JSON.stringify(profile))
-
-          setLoading(false)
-          navigate(profile.role === 'admin' ? '/admin' : '/dashboard')
-          return
-        } catch {
-          /* corrupt data */
+      if (authMethod === 'email') {
+        const stored = localStorage.getItem('lawyer_profile') || localStorage.getItem('ld:lawyer_profile')
+        if (stored) {
+          try { fallbackProfile = JSON.parse(stored) } catch { /* corrupt */ }
         }
+      } else {
+        fallbackProfile = await db.getProfileByPhone(phone.trim())
+      }
+
+      if (fallbackProfile && signInError.message !== 'Email not confirmed') {
+        setProfile(fallbackProfile)
+        setRegistered(true)
+        setAuthenticated(true)
+        localStorage.setItem('lawyer_profile', JSON.stringify(fallbackProfile))
+        setLoading(false)
+        navigate(fallbackProfile.role === 'admin' ? '/admin' : '/dashboard')
+        return
       }
 
       if (signInError.message === 'Email not confirmed') {
         setError('Please confirm your email address before signing in. Check your inbox (and spam/junk folder).')
-      } else if (signInError.message === 'Invalid login credentials') {
-        const fallback = localStorage.getItem('lawyer_profile') || localStorage.getItem('ld:lawyer_profile')
-        if (fallback) {
-          try {
-            const profile = JSON.parse(fallback) as LawyerProfile
-            setProfile(profile)
-            setRegistered(true)
-            setAuthenticated(true)
-            localStorage.setItem('lawyer_profile', JSON.stringify(profile))
-            setLoading(false)
-            navigate(profile.role === 'admin' ? '/admin' : '/dashboard')
-            return
-          } catch { /* corrupt data */ }
-        }
-        setError('Invalid email or password. If you registered recently, try logging in with the correct credentials.')
+      } else if (signInError.message === 'Invalid login credentials' && fallbackProfile) {
+        setProfile(fallbackProfile)
+        setRegistered(true)
+        setAuthenticated(true)
+        localStorage.setItem('lawyer_profile', JSON.stringify(fallbackProfile))
+        setLoading(false)
+        navigate(fallbackProfile.role === 'admin' ? '/admin' : '/dashboard')
+        return
       } else {
         setError(
           signInError.message === 'Failed to fetch'
             ? 'Cannot connect to server. Try again later.'
-            : signInError.message,
+            : 'Invalid ' + (authMethod === 'email' ? 'email' : 'phone') + ' or password.',
         )
       }
       setLoading(false)
@@ -143,7 +142,7 @@ export default function Login() {
     if (profile && profile.role && profile.role !== roleMap[loginRole]) {
       await supabase.auth.signOut()
       setError(
-        `This email belongs to ${roleLabel[profile.role]}. Please use the correct login tab.`
+        `This account belongs to ${roleLabel[profile.role]}. Please use the correct login tab.`
       )
       setLoading(false)
       return
@@ -206,15 +205,50 @@ export default function Login() {
             </div>
           )}
 
-          <Input
-            id="email"
-            label="Email Address"
-            type="email"
-            placeholder={config.emailPlaceholder}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          {loginRole !== 'admin' && (
+            <div className="flex rounded-lg border border-slate-200 bg-slate-100 p-0.5">
+              <button
+                type="button"
+                onClick={() => { setAuthMethod('email'); setError('') }}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+                  authMethod === 'email' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                <Mail size={14} /> Email
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAuthMethod('phone'); setError('') }}
+                className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+                  authMethod === 'phone' ? 'bg-white text-blue-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                <Smartphone size={14} /> Phone
+              </button>
+            </div>
+          )}
+
+          {authMethod === 'email' ? (
+            <Input
+              id="email"
+              label="Email Address"
+              type="email"
+              placeholder={config.emailPlaceholder}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          ) : (
+            <Input
+              id="phone"
+              label="Mobile Number"
+              type="tel"
+              placeholder="e.g. 0300-1234567"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+            />
+          )}
 
           <PasswordInput
             id="password"

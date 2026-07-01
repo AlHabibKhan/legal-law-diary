@@ -55,6 +55,19 @@ export const localDb = {
 
   // ===== Auth =====
 
+  async getProfileByPhone(phone: string): Promise<LawyerProfile | null> {
+    const stored = localStorage.getItem('lawyer_profile') || localStorage.getItem('ld:lawyer_profile')
+    if (!stored) return null
+    try {
+      const profile = JSON.parse(stored) as LawyerProfile
+      const stripped = phone.replace(/[\s\-\(\)]/g, '')
+      const storedPhone = (profile.mobile_number || '').replace(/[\s\-\(\)]/g, '')
+      return storedPhone === stripped ? profile : null
+    } catch {
+      return null
+    }
+  },
+
   async isRegistered(): Promise<boolean> {
     return localStorage.getItem('is_registered') === 'true'
   },

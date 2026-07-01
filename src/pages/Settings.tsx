@@ -195,13 +195,20 @@ export default function Settings() {
     }
 
     setPasswordLoading(true)
-    const { error } = await supabase.auth.updateUser({ password: passwordForm.newPass })
-    if (error) {
-      setPasswordError(error.message)
-    } else {
-      setPasswordForm({ current: '', newPass: '', confirm: '' })
-      setShowPasswordSection(false)
+    localStorage.setItem('app_password', passwordForm.newPass)
+
+    if (hasSession) {
+      const { error } = await supabase.auth.updateUser({ password: passwordForm.newPass })
+      if (error) {
+        // Cloud update failed but local save succeeded
+        setPasswordError('Cloud update failed: ' + error.message + '. Password saved locally.')
+        setPasswordLoading(false)
+        return
+      }
     }
+
+    setPasswordForm({ current: '', newPass: '', confirm: '' })
+    setShowPasswordSection(false)
     setPasswordLoading(false)
   }
 
@@ -396,14 +403,7 @@ export default function Settings() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!hasSession ? (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-              <div className="flex items-start gap-2">
-                <CloudOff className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-                <p>You're using offline/local mode. Sign in with your cloud account to change your password.</p>
-              </div>
-            </div>
-          ) : showPasswordSection ? (
+          {showPasswordSection ? (
             <>
               <PasswordInput
                 label="New Password"
@@ -427,6 +427,9 @@ export default function Settings() {
                   {passwordLoading ? 'Updating...' : 'Update Password'}
                 </Button>
               </div>
+              {!hasSession && (
+                <p className="text-xs text-slate-400 text-center">Password saved locally (offline mode)</p>
+              )}
             </>
           ) : (
             <Button variant="outline" size="sm" onClick={() => setShowPasswordSection(true)}>
