@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   Scale, User, Building2, ArrowRight, Lock,
   BookOpen, CalendarCheck, Users, FileText, Gavel, BarChart3, ShieldCheck,
+  Calculator, Clock, DollarSign, Calendar,
 } from 'lucide-react'
 import { AdBanner } from '@/components/ads/AdBanner'
 
@@ -75,6 +76,27 @@ export default function Landing() {
                 </div>
               )
             })}
+          </div>
+        </div>
+
+        {/* Tools Promo */}
+        <div className="w-full rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 p-6 text-white shadow-lg">
+          <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/20">
+              <Calculator className="h-7 w-7" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold">Legal Tools & Calculators</h3>
+              <p className="mt-1 text-sm text-blue-100">
+                Limitation · Court Fee · Interest on Decree · Date Math · Case Age
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/tools')}
+              className="flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-blue-700 transition-colors hover:bg-blue-50"
+            >
+              Explore Tools <ArrowRight className="h-4 w-4" />
+            </button>
           </div>
         </div>
 
