@@ -377,18 +377,7 @@ export default function Register() {
           </button>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
-          {features.map((f) => (
-            <div
-              key={f.title}
-              className="rounded-lg border border-blue-100 bg-blue-50/60 p-2.5 text-center"
-            >
-              <f.icon className="mx-auto h-5 w-5 text-blue-600" />
-              <p className="mt-1 text-[11px] font-semibold text-slate-900 leading-tight">{f.title}</p>
-              <p className="mt-0.5 text-[10px] text-slate-500 leading-tight">{f.desc}</p>
-            </div>
-          ))}
-        </div>
+        <AdBanner adKey="REGISTER_TOP" height={90} width={728} className="mx-auto mb-2" />
 
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           {step === 1 && renderStep1()}
