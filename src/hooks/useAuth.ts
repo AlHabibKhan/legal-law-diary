@@ -48,7 +48,7 @@ export const useAuth = create<AuthState>((set) => ({
     const { data: { session } } = await supabase.auth.getSession()
     if (!session?.user) {
       const registered = localStorage.getItem('is_registered') === 'true'
-      const storedProfile = localStorage.getItem('lawyer_profile')
+      const storedProfile = localStorage.getItem('lawyer_profile') || localStorage.getItem('ld:lawyer_profile')
       const hasPin = !!localStorage.getItem('app_pin')
 
       if (registered && storedProfile) {
@@ -62,6 +62,8 @@ export const useAuth = create<AuthState>((set) => ({
             isAdmin: profile.role === 'admin',
             trialDaysLeft: null,
           })
+          // ensure bare key exists for login fallback
+          localStorage.setItem('lawyer_profile', storedProfile)
         } catch {
           // corrupt data
         }
@@ -101,7 +103,7 @@ export const useAuth = create<AuthState>((set) => ({
           : null,
       })
     } else {
-      const storedProfile = localStorage.getItem('lawyer_profile')
+      const storedProfile = localStorage.getItem('lawyer_profile') || localStorage.getItem('ld:lawyer_profile')
       if (storedProfile) {
         try {
           const localProfile = JSON.parse(storedProfile)
@@ -113,6 +115,7 @@ export const useAuth = create<AuthState>((set) => ({
             isAdmin: localProfile.role === 'admin',
             trialDaysLeft: null,
           })
+          localStorage.setItem('lawyer_profile', storedProfile)
         } catch { /* corrupt data */ }
       }
     }

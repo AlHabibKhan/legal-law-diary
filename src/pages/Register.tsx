@@ -146,9 +146,10 @@ export default function Register() {
       await supabase.auth.signInWithPassword({ email: email.trim(), password }).catch(() => {})
 
       const userId = authData?.user?.id || generateId()
+      let profile: LawyerProfile
 
       if (registerRole === 'individual') {
-        const profile: LawyerProfile = {
+        profile = {
           id: userId,
           ...form,
           cnic: form.cnic || null,
@@ -162,7 +163,7 @@ export default function Register() {
         }
         setProfile(profile)
       } else {
-        const profile: LawyerProfile = {
+        profile = {
           id: userId,
           full_name: firmForm.your_name,
           bar_council: 'PBC',
@@ -181,6 +182,8 @@ export default function Register() {
       }
 
       db.setPin(pin)
+      localStorage.setItem('lawyer_profile', JSON.stringify(profile))
+      localStorage.setItem('is_registered', 'true')
       setRegistered(true)
       setAuthenticated(true)
     } catch (err) {

@@ -82,7 +82,7 @@ export default function Login() {
     })
 
     if (signInError) {
-      const storedProfile = localStorage.getItem('lawyer_profile')
+      const storedProfile = localStorage.getItem('lawyer_profile') || localStorage.getItem('ld:lawyer_profile')
 
       if (storedProfile && signInError.message !== 'Email not confirmed') {
         try {
@@ -90,6 +90,8 @@ export default function Login() {
           setProfile(profile)
           setRegistered(true)
           setAuthenticated(true)
+          // ensure bare key exists for future lookups
+          localStorage.setItem('lawyer_profile', JSON.stringify(profile))
 
           setLoading(false)
           navigate(profile.role === 'admin' ? '/admin' : '/dashboard')
@@ -101,6 +103,21 @@ export default function Login() {
 
       if (signInError.message === 'Email not confirmed') {
         setError('Please confirm your email address before signing in. Check your inbox (and spam/junk folder).')
+      } else if (signInError.message === 'Invalid login credentials') {
+        const fallback = localStorage.getItem('lawyer_profile') || localStorage.getItem('ld:lawyer_profile')
+        if (fallback) {
+          try {
+            const profile = JSON.parse(fallback) as LawyerProfile
+            setProfile(profile)
+            setRegistered(true)
+            setAuthenticated(true)
+            localStorage.setItem('lawyer_profile', JSON.stringify(profile))
+            setLoading(false)
+            navigate(profile.role === 'admin' ? '/admin' : '/dashboard')
+            return
+          } catch { /* corrupt data */ }
+        }
+        setError('Invalid email or password. If you registered recently, try logging in with the correct credentials.')
       } else {
         setError(
           signInError.message === 'Failed to fetch'
