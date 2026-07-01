@@ -29,8 +29,9 @@ export function SideAdPanel({ side }: SideAdPanelProps) {
         </p>
 
         <AdBanner
-          adSlot="side-panel"
-          format="vertical"
+          adKey="SIDE_PANEL"
+          height={600}
+          width={300}
           className="mb-3"
         />
 
@@ -52,7 +53,7 @@ export function SideAdPanel({ side }: SideAdPanelProps) {
         </div>
 
         <div className="pt-2">
-          <AdBanner adSlot="side-panel-bottom" format="rectangle" />
+          <AdBanner adKey="SIDE_PANEL_BOTTOM" height={250} width={300} />
         </div>
       </div>
 

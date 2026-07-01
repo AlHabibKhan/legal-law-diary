@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { Select } from '@/components/ui/select'
+import { AdBanner } from '@/components/ads/AdBanner'
 import {
   Scale,
   BookOpen,
@@ -521,6 +522,8 @@ export default function Register() {
         <p className="text-center text-xs text-slate-400">
           Your data is encrypted and securely stored in the cloud
         </p>
+
+        <AdBanner adKey="REGISTER_BANNER" height={250} width={300} className="mx-auto" />
 
         <p className="text-center text-sm text-slate-500">
           Already have an account?{' '}

@@ -6,6 +6,7 @@ import { checkConnection } from '@/lib/db'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
+import { AdBanner } from '@/components/ads/AdBanner'
 import { Scale, Lock, LogIn, User, Building2, Shield, ArrowRight } from 'lucide-react'
 
 type LoginRole = 'individual' | 'firm' | 'admin'
@@ -204,6 +205,8 @@ export default function Login() {
             Practice management tool — not a substitute for legal advice.
           </p>
         </div>
+
+        <AdBanner adKey="LOGIN_BANNER" height={250} width={300} className="mx-auto" />
 
         <p className="text-center text-sm text-slate-500">
           New here?{' '}

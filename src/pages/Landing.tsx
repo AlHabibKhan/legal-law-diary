@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Scale, User, Building2, ArrowRight, Lock } from 'lucide-react'
+import { AdBanner } from '@/components/ads/AdBanner'
 
 const roles = [
   {
@@ -79,6 +80,8 @@ export default function Landing() {
             )
           })}
         </div>
+
+        <AdBanner adKey="LANDING_BANNER" height={90} width={728} className="w-full max-w-2xl mx-auto" />
 
         {/* Footer links */}
         <div className="text-center">
