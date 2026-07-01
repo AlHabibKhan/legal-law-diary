@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import { checkConnection } from '@/lib/db'
+import type { LawyerProfile } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
@@ -79,7 +80,29 @@ export default function Login() {
     })
 
     if (signInError) {
-      setError(signInError.message)
+      const storedProfile = localStorage.getItem('lawyer_profile')
+      const storedPin = localStorage.getItem('app_pin')
+
+      if (storedProfile && storedPin) {
+        try {
+          const profile = JSON.parse(storedProfile) as LawyerProfile
+          setProfile(profile)
+          setRegistered(true)
+          setAuthenticated(true)
+
+          setLoading(false)
+          navigate(profile.role === 'admin' ? '/admin' : '/dashboard')
+          return
+        } catch {
+          /* corrupt data */
+        }
+      }
+
+      setError(
+        signInError.message === 'Failed to fetch'
+          ? 'Cannot connect to server. Using offline mode — sign in with your device PIN instead.'
+          : signInError.message,
+      )
       setLoading(false)
       return
     }

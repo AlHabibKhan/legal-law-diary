@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -172,34 +173,34 @@ export default function Dashboard() {
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <a
-              href="/diary/new"
+            <Link
+              to="/diary/new"
               className="flex items-center gap-3 rounded-lg border border-slate-200 p-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
             >
               <BookOpen size={18} className="text-blue-600" />
               Add Diary Entry
-            </a>
-            <a
-              href="/cases/new"
+            </Link>
+            <Link
+              to="/cases/new"
               className="flex items-center gap-3 rounded-lg border border-slate-200 p-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
             >
               <Briefcase size={18} className="text-blue-600" />
               New Case
-            </a>
-            <a
-              href="/clients/new"
+            </Link>
+            <Link
+              to="/clients/new"
               className="flex items-center gap-3 rounded-lg border border-slate-200 p-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
             >
               <Users size={18} className="text-blue-600" />
               Register Client
-            </a>
-            <a
-              href="/courts"
+            </Link>
+            <Link
+              to="/courts"
               className="flex items-center gap-3 rounded-lg border border-slate-200 p-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
             >
               <Calendar size={18} className="text-blue-600" />
               Browse Courts
-            </a>
+            </Link>
           </CardContent>
         </Card>
       </div>
