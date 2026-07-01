@@ -24,7 +24,7 @@ const navItems = [
   { to: '/cases', icon: Briefcase, label: 'Cases' },
   { to: '/clients', icon: Users, label: 'Clients' },
   { to: '/courts', icon: Building2, label: 'Court Directory' },
-  { to: '/limitation-calculator', icon: Calculator, label: 'Limitation Calc' },
+  { to: '/tools', icon: Calculator, label: 'Tools' },
   { to: '/pricing', icon: CreditCard, label: 'Subscription' },
   { to: '/settings', icon: Settings, label: 'Settings' },
   { to: '/settings', icon: Download, label: 'Data Backup' },

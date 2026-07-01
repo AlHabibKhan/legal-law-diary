@@ -19,7 +19,7 @@ import Clients from '@/pages/Clients'
 import NewClient from '@/pages/NewClient'
 import ClientDetail from '@/pages/ClientDetail'
 import Courts from '@/pages/Courts'
-import LimitationCalc from '@/pages/LimitationCalc'
+import Tools from '@/pages/Tools'
 import Settings from '@/pages/Settings'
 import Pricing from '@/pages/Pricing'
 import Subscribe from '@/pages/Subscribe'
@@ -110,7 +110,8 @@ export default function App() {
           <Route path="/clients/new" element={<SubscriptionGuard><NewClient /></SubscriptionGuard>} />
           <Route path="/clients/:id" element={<SubscriptionGuard><ClientDetail /></SubscriptionGuard>} />
           <Route path="/courts" element={<SubscriptionGuard><Courts /></SubscriptionGuard>} />
-          <Route path="/limitation-calculator" element={<SubscriptionGuard><LimitationCalc /></SubscriptionGuard>} />
+          <Route path="/tools" element={<SubscriptionGuard><Tools /></SubscriptionGuard>} />
+          <Route path="/limitation-calculator" element={<Navigate to="/tools" replace />} />
           <Route path="/settings" element={<SubscriptionGuard><Settings /></SubscriptionGuard>} />
         </Route>
 
