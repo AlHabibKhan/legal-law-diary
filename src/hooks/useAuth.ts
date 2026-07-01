@@ -98,6 +98,21 @@ export const useAuth = create<AuthState>((set) => ({
           ? Math.max(0, Math.ceil((new Date(profile.trial_ends_at).getTime() - Date.now()) / 86400000))
           : null,
       })
+    } else {
+      const storedProfile = localStorage.getItem('lawyer_profile')
+      if (storedProfile) {
+        try {
+          const localProfile = JSON.parse(storedProfile)
+          set({
+            profile: localProfile,
+            isRegistered: true,
+            isAuthenticated: true,
+            pinSet: !!localStorage.getItem('app_pin'),
+            isAdmin: localProfile.role === 'admin',
+            trialDaysLeft: null,
+          })
+        } catch { /* corrupt data */ }
+      }
     }
   },
 }))

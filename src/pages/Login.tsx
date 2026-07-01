@@ -86,7 +86,14 @@ export default function Login() {
     await checkConnection()
     await initialize()
 
-    const profile = useAuth.getState().profile
+    const { profile, isAuthenticated, isAdmin } = useAuth.getState()
+
+    if (!isAuthenticated) {
+      setError('Account not found. Please register first or check your credentials.')
+      setLoading(false)
+      return
+    }
+
     if (profile && profile.role && profile.role !== roleMap[loginRole]) {
       await supabase.auth.signOut()
       setError(
@@ -97,6 +104,7 @@ export default function Login() {
     }
 
     setLoading(false)
+    navigate(isAdmin ? '/admin' : '/dashboard')
   }
 
   return (

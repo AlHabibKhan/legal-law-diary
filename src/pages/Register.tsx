@@ -173,7 +173,7 @@ export default function Register() {
         if (!authError && authData?.user) {
           await db.registerLawyer(profile)
         } else {
-          db.registerLawyer(profile)
+          await db.registerLawyer(profile)
         }
         setProfile(profile)
       } else {
@@ -189,7 +189,7 @@ export default function Register() {
         if (!authError && authData?.user) {
           await db.registerLawyer(profile)
         } else {
-          db.registerLawyer(profile)
+          await db.registerLawyer(profile)
         }
         setProfile(profile)
       }
