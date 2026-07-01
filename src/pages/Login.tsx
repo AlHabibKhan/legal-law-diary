@@ -81,9 +81,8 @@ export default function Login() {
 
     if (signInError) {
       const storedProfile = localStorage.getItem('lawyer_profile')
-      const storedPin = localStorage.getItem('app_pin')
 
-      if (storedProfile && storedPin) {
+      if (storedProfile) {
         try {
           const profile = JSON.parse(storedProfile) as LawyerProfile
           setProfile(profile)
@@ -100,7 +99,7 @@ export default function Login() {
 
       setError(
         signInError.message === 'Failed to fetch'
-          ? 'Cannot connect to server. Using offline mode — sign in with your device PIN instead.'
+          ? 'Cannot connect to server. Try again later.'
           : signInError.message,
       )
       setLoading(false)

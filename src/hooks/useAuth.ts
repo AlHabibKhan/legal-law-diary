@@ -57,6 +57,7 @@ export const useAuth = create<AuthState>((set) => ({
           set({
             profile,
             isRegistered: true,
+            isAuthenticated: true,
             pinSet: hasPin,
             isAdmin: profile.role === 'admin',
             trialDaysLeft: null,
