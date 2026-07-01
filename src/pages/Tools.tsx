@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { Calculator, Calendar, Clock, DollarSign, Scale, Gavel } from 'lucide-react'
+import { Calculator, Calendar, Clock, DollarSign, Scale, Gavel, ArrowLeft } from 'lucide-react'
+import { AdBanner } from '@/components/ads/AdBanner'
 import { formatDate } from '@/lib/utils'
 
 type TabId = 'limitation' | 'court-fee' | 'interest' | 'date-math' | 'case-age'
@@ -469,9 +471,17 @@ function CaseAgeTab() {
 
 export default function Tools() {
   const [activeTab, setActiveTab] = useState<TabId>('limitation')
+  const navigate = useNavigate()
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-800 transition-colors"
+      >
+        <ArrowLeft size={16} /> Back
+      </button>
+
       <h1 className="text-2xl font-bold text-slate-900">Legal Tools & Calculators</h1>
 
       {/* Tab Bar */}
@@ -487,6 +497,8 @@ export default function Tools() {
         ))}
       </div>
 
+      <AdBanner adKey="TOOLS_TOP" height={90} width={728} className="mx-auto" />
+
       {/* Active Tab Content */}
       <Card>
         <CardHeader>
@@ -500,6 +512,8 @@ export default function Tools() {
           {activeTab === 'case-age' && <CaseAgeTab />}
         </CardContent>
       </Card>
+
+      <AdBanner adKey="TOOLS_BANNER" height={250} width={300} className="mx-auto" />
     </div>
   )
 }
