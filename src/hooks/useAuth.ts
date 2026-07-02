@@ -46,30 +46,7 @@ export const useAuth = create<AuthState>((set) => ({
     await checkConnection()
 
     const { data: { session } } = await supabase.auth.getSession()
-    if (!session?.user) {
-      const registered = localStorage.getItem('is_registered') === 'true'
-      const storedProfile = localStorage.getItem('lawyer_profile') || localStorage.getItem('ld:lawyer_profile')
-      const hasPin = !!localStorage.getItem('app_pin')
-
-      if (registered && storedProfile) {
-        try {
-          const profile = JSON.parse(storedProfile)
-          set({
-            profile,
-            isRegistered: true,
-            isAuthenticated: true,
-            pinSet: hasPin,
-            isAdmin: profile.role === 'admin',
-            trialDaysLeft: null,
-          })
-          // ensure bare key exists for login fallback
-          localStorage.setItem('lawyer_profile', storedProfile)
-        } catch {
-          // corrupt data
-        }
-      }
-      return
-    }
+    if (!session?.user) return
 
     const { data: profile } = await supabase
       .from('profiles')

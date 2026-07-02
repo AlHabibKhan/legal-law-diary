@@ -73,6 +73,16 @@ export default function Login() {
     admin: 'a Super Admin',
   }
 
+  function checkLocalPassword(): boolean {
+    const storedPassword = localStorage.getItem('app_password')
+    if (storedPassword && storedPassword !== password) {
+      setError('Invalid ' + (authMethod === 'email' ? 'email' : 'phone') + ' or password.')
+      setLoading(false)
+      return false
+    }
+    return true
+  }
+
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
     setError('')
@@ -98,6 +108,7 @@ export default function Login() {
       }
 
       if (fallbackProfile && signInError.message !== 'Email not confirmed') {
+        if (!checkLocalPassword()) return
         setProfile(fallbackProfile)
         setRegistered(true)
         setAuthenticated(true)
@@ -112,6 +123,7 @@ export default function Login() {
       if (signInError.message === 'Email not confirmed') {
         setError('Please confirm your email address before signing in. Check your inbox (and spam/junk folder).')
       } else if (signInError.message === 'Invalid login credentials' && fallbackProfile) {
+        if (!checkLocalPassword()) return
         setProfile(fallbackProfile)
         setRegistered(true)
         setAuthenticated(true)
