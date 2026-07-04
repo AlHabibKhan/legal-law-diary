@@ -25,6 +25,7 @@ import Pricing from '@/pages/Pricing'
 import Subscribe from '@/pages/Subscribe'
 import PaymentStatus from '@/pages/PaymentStatus'
 import Legal from '@/pages/Legal'
+import LegalDrafter from '@/pages/LegalDrafter'
 import AdminDashboard from '@/pages/admin/AdminDashboard'
 import AdminUsers from '@/pages/admin/AdminUsers'
 import AdminSubscriptions from '@/pages/admin/AdminSubscriptions'
@@ -77,6 +78,7 @@ export default function App() {
         <Route path="/legal" element={<Legal />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/tools" element={<Tools />} />
+        <Route path="/legal-drafter" element={<ProtectedRoute><LegalDrafter /></ProtectedRoute>} />
         <Route path="/limitation-calculator" element={<Navigate to="/tools" replace />} />
         <Route path="/subscribe/:planId" element={<Subscribe />} />
         <Route path="/payment-status" element={<PaymentStatus />} />

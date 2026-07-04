@@ -484,6 +484,35 @@ export default function Tools() {
 
       <h1 className="text-2xl font-bold text-slate-900">Legal Tools & Calculators</h1>
 
+      {/* Legal Drafter Promo Card */}
+      <div
+        onClick={() => navigate('/legal-drafter')}
+        className="cursor-pointer rounded-lg border border-[#c9a84c] bg-gradient-to-r from-[#0a1628] via-[#0d2240] to-[#0a1628] p-5 transition-all hover:shadow-lg hover:shadow-[#c9a84c]/10"
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-br from-[#c9a84c] to-[#e8c86e] text-2xl shadow-lg">
+            ⚖️
+          </div>
+          <div className="flex-1">
+            <h2 className="text-lg font-bold text-[#c9a84c]">AI Legal Case Drafter</h2>
+            <p className="mt-1 text-sm text-[#8fb3d3]">
+              Generate court-ready petitions, plaints, and legal drafts for Pakistani courts.
+              AI-powered with Gemini · Rs. 500 per draft via JazzCash
+            </p>
+          </div>
+          <div className="hidden items-center gap-1 rounded-md bg-[#c9a84c] px-4 py-2 text-sm font-bold text-[#0a1628] sm:flex">
+            Open Drafting <span className="text-lg">→</span>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {['Civil', 'Criminal', 'Family', 'Property', 'Consumer', 'Cyber Crime'].map(tag => (
+            <span key={tag} className="rounded-full border border-[#1e3d5c] px-2.5 py-0.5 text-[11px] text-[#5a8ab5]">
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* Tab Bar */}
       <div className="flex flex-wrap gap-2">
         {tabs.map((tab) => (

@@ -118,6 +118,28 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Quick Actions */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Link to="/legal-drafter" className="block">
+          <div className="rounded-lg border border-[#c9a84c]/40 bg-gradient-to-br from-[#0a1628] to-[#0d2240] p-4 transition-all hover:shadow-lg hover:shadow-[#c9a84c]/10">
+            <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#c9a84c] to-[#e8c86e] text-lg shadow">
+              ⚖️
+            </div>
+            <p className="text-sm font-bold text-[#c9a84c]">AI Legal Drafter</p>
+            <p className="mt-0.5 text-[11px] text-[#5a8ab5]">Generate petitions & drafts</p>
+          </div>
+        </Link>
+        <Link to="/tools" className="block">
+          <div className="rounded-lg border border-slate-200 bg-white p-4 transition-all hover:shadow-md">
+            <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-lg text-blue-600 shadow">
+              🛠️
+            </div>
+            <p className="text-sm font-bold text-slate-900">Legal Tools</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">Calculators & utilities</p>
+          </div>
+        </Link>
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
