@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
@@ -472,6 +473,7 @@ function CaseAgeTab() {
 export default function Tools() {
   const [activeTab, setActiveTab] = useState<TabId>('limitation')
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -486,7 +488,13 @@ export default function Tools() {
 
       {/* Legal Drafter Promo Card */}
       <div
-        onClick={() => navigate('/legal-drafter')}
+        onClick={() => {
+          if (isAuthenticated) {
+            navigate('/legal-drafter')
+          } else {
+            navigate('/login?redirect=/legal-drafter')
+          }
+        }}
         className="cursor-pointer rounded-lg border border-[#c9a84c] bg-gradient-to-r from-[#0a1628] via-[#0d2240] to-[#0a1628] p-5 transition-all hover:shadow-lg hover:shadow-[#c9a84c]/10"
       >
         <div className="flex items-center gap-4">

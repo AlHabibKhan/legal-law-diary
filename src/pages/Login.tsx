@@ -48,6 +48,7 @@ export default function Login() {
   const { setAuthenticated, setProfile, setRegistered, initialize } = useAuth()
   const [searchParams] = useSearchParams()
   const defaultRole = (searchParams.get('role') as LoginRole) || 'individual'
+  const redirectTo = searchParams.get('redirect')
   const [loginRole, setLoginRole] = useState<LoginRole>(defaultRole)
   const [authMethod, setAuthMethod] = useState<'email' | 'phone'>('email')
   const [email, setEmail] = useState('')
@@ -116,7 +117,7 @@ export default function Login() {
         await checkConnection()
         db.syncOnLogin().catch(() => {})
         setLoading(false)
-        navigate(fallbackProfile.role === 'admin' ? '/admin' : '/dashboard')
+        navigate(redirectTo || (fallbackProfile.role === 'admin' ? '/admin' : '/dashboard'))
         return
       }
 
@@ -131,7 +132,7 @@ export default function Login() {
         await checkConnection()
         db.syncOnLogin().catch(() => {})
         setLoading(false)
-        navigate(fallbackProfile.role === 'admin' ? '/admin' : '/dashboard')
+        navigate(redirectTo || (fallbackProfile.role === 'admin' ? '/admin' : '/dashboard'))
         return
       } else {
         setError(
@@ -166,7 +167,7 @@ export default function Login() {
     }
 
     setLoading(false)
-    navigate(isAdmin ? '/admin' : '/dashboard')
+    navigate(redirectTo || (isAdmin ? '/admin' : '/dashboard'))
   }
 
   return (
