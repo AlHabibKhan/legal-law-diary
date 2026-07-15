@@ -2,9 +2,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import {
   Scale, User, Building2, ArrowRight, Lock,
   BookOpen, CalendarCheck, Users, FileText, Gavel, BarChart3, ShieldCheck,
-  Calculator, Clock, DollarSign, Calendar,
+  Calculator, Clock, DollarSign, Calendar, HelpCircle,
 } from 'lucide-react'
 import { AdBanner } from '@/components/ads/AdBanner'
+import { FAQSection } from '@/components/FAQSection'
+import { FAQ_DATA } from '@/data/faq'
 
 const features = [
   { icon: BookOpen, title: 'Case Management', desc: 'Organize and track all your legal cases in one place' },
@@ -143,6 +145,24 @@ export default function Landing() {
 
         <AdBanner adKey="LANDING_BANNER" height={90} width={728} className="w-full max-w-2xl mx-auto" />
 
+        {/* FAQ Section */}
+        <div className="w-full">
+          <FAQSection
+            items={FAQ_DATA.slice(0, 6)}
+            title="Common Questions"
+            subtitle="Before you ask."
+          />
+          <div className="mt-3 text-center">
+            <Link
+              to="/faq"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800"
+            >
+              <HelpCircle size={15} />
+              View all {FAQ_DATA.length} questions
+            </Link>
+          </div>
+        </div>
+
         {/* Footer links */}
         <div className="text-center">
           <div className="rounded-xl border border-slate-200 bg-white px-6 py-3 shadow-sm">
@@ -154,6 +174,10 @@ export default function Landing() {
               <a href="/legal" className="text-blue-600 underline hover:text-blue-800">Terms of Service</a>
               <span className="mx-1.5">|</span>
               <a href="/legal#privacy" className="text-blue-600 underline hover:text-blue-800">Privacy Policy</a>
+              <span className="mx-1.5">|</span>
+              <a href="/faq" className="text-blue-600 underline hover:text-blue-800">FAQ</a>
+              <span className="mx-1.5">|</span>
+              <a href="/guides" className="text-blue-600 underline hover:text-blue-800">Guides</a>
               <span className="mx-1.5">|</span>
               <a href="/legal#disclaimer" className="text-blue-600 underline hover:text-blue-800">Disclaimer</a>
             </p>

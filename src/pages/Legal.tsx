@@ -152,6 +152,11 @@ export default function Legal() {
         </section>
 
         <div className="border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
+          <p className="mb-2">
+            <a href="/faq" className="text-blue-600 underline hover:text-blue-800">FAQ</a>
+            <span className="mx-2">|</span>
+            <a href="/guides" className="text-blue-600 underline hover:text-blue-800">Guides</a>
+          </p>
           <p>Legal Law Diary v1.0 &mdash; Practice management tool for Pakistan courts</p>
           <p className="mt-1">Questions? Contact the administrator.</p>
         </div>

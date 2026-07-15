@@ -330,6 +330,8 @@ export const tauriDb = {
       today_hearings: todayRows[0]?.count ?? 0,
       upcoming_hearings: upcomingRows[0]?.count ?? 0,
       total_clients: clientRows[0]?.count ?? 0,
+      pending_tasks: 0,
+      todays_time_minutes: 0,
     }
   },
 }

@@ -26,6 +26,9 @@ import Subscribe from '@/pages/Subscribe'
 import PaymentStatus from '@/pages/PaymentStatus'
 import Legal from '@/pages/Legal'
 import LegalDrafter from '@/pages/LegalDrafter'
+import FAQ from '@/pages/FAQ'
+import Guides from '@/pages/Guides'
+import GuideDetail from '@/pages/GuideDetail'
 import TimeTracking from '@/pages/TimeTracking'
 import Tasks from '@/pages/Tasks'
 import AdminDashboard from '@/pages/admin/AdminDashboard'
@@ -78,6 +81,9 @@ export default function App() {
 
         {/* Public utility pages */}
         <Route path="/legal" element={<Legal />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/guides" element={<Guides />} />
+        <Route path="/guides/:slug" element={<GuideDetail />} />
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/tools" element={<Tools />} />
         <Route path="/legal-drafter" element={<ProtectedRoute><LegalDrafter /></ProtectedRoute>} />

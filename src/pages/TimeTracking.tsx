@@ -22,7 +22,7 @@ export default function TimeTracking() {
   const [isBillable, setIsBillable] = useState(true)
   const [todayTotal, setTodayTotal] = useState(0)
   const [showManual, setShowManual] = useState(false)
-  const intervalRef = useRef<ReturnType<typeof setInterval>>()
+  const intervalRef = useRef<ReturnType<typeof setInterval>>(undefined)
 
   useEffect(() => {
     loadData()
@@ -202,7 +202,7 @@ export default function TimeTracking() {
 
             <div className="flex gap-3">
               {running ? (
-                <Button onClick={stopTimer} variant="destructive">
+                <Button onClick={stopTimer} variant="danger">
                   <Square size={16} className="mr-1" /> Stop
                 </Button>
               ) : (

@@ -26,6 +26,8 @@ export default function Dashboard() {
     today_hearings: 0,
     upcoming_hearings: 0,
     total_clients: 0,
+    pending_tasks: 0,
+    todays_time_minutes: 0,
   })
   const [todayEntries, setTodayEntries] = useState<DiaryEntry[]>([])
   const [showBackupBanner, setShowBackupBanner] = useState(false)
