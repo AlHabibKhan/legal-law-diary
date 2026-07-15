@@ -1,15 +1,15 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { Calculator, Calendar, Clock, DollarSign, Scale, Gavel, ArrowLeft } from 'lucide-react'
+import { Calculator, Calendar, Clock, DollarSign, Scale, Gavel, ArrowLeft, Sun } from 'lucide-react'
 import { AdBanner } from '@/components/ads/AdBanner'
 import { formatDate } from '@/lib/utils'
 
-type TabId = 'limitation' | 'court-fee' | 'interest' | 'date-math' | 'case-age'
+type TabId = 'limitation' | 'court-fee' | 'interest' | 'date-math' | 'case-age' | 'holidays'
 
 const tabs: { id: TabId; label: string; icon: typeof Calculator }[] = [
   { id: 'limitation', label: 'Limitation', icon: Clock },
@@ -17,6 +17,7 @@ const tabs: { id: TabId; label: string; icon: typeof Calculator }[] = [
   { id: 'interest', label: 'Interest', icon: Gavel },
   { id: 'date-math', label: 'Date Math', icon: Calendar },
   { id: 'case-age', label: 'Case Age', icon: Scale },
+  { id: 'holidays', label: 'Court Holidays', icon: Sun },
 ]
 
 const LIMITATION_PERIODS = [
@@ -391,6 +392,98 @@ function DateMathTab() {
   )
 }
 
+const HOLIDAY_TYPE_COLORS: Record<string, string> = {
+  public: 'bg-red-50 text-red-700 border-red-200',
+  court: 'bg-amber-50 text-amber-700 border-amber-200',
+  religious: 'bg-purple-50 text-purple-700 border-purple-200',
+}
+
+const HOLIDAY_TYPE_LABELS: Record<string, string> = {
+  public: 'Public',
+  court: 'Court',
+  religious: 'Religious',
+}
+
+function HolidayTab() {
+  const [holidays, setHolidays] = useState<import('@/types').CourtHoliday[]>([])
+  const [nextHoliday, setNextHoliday] = useState<import('@/types').CourtHoliday | null>(null)
+
+  useEffect(() => {
+    import('@/data/court-holidays').then((mod) => {
+      setHolidays(mod.PAKISTAN_COURT_HOLIDAYS)
+      setNextHoliday(mod.getNextHoliday())
+    })
+  }, [])
+
+  const now = new Date()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+
+  const monthHolidays = holidays.filter(h => {
+    const d = new Date(h.date)
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear
+  })
+
+  const upcoming = holidays
+    .filter(h => h.date >= now.toISOString().split('T')[0])
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(0, 10)
+
+  return (
+    <div className="space-y-6">
+      {nextHoliday && (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+          <p className="text-xs font-medium text-blue-600 uppercase tracking-wide">Next Holiday</p>
+          <p className="mt-1 text-lg font-bold text-blue-900">{nextHoliday.name}</p>
+          <p className="text-sm text-blue-700">{nextHoliday.date}</p>
+        </div>
+      )}
+
+      <div>
+        <h3 className="text-sm font-semibold text-slate-700 mb-3">
+          Upcoming Holidays
+        </h3>
+        <div className="space-y-2">
+          {upcoming.map((h, i) => (
+            <div key={i} className="flex items-center justify-between rounded-lg border border-slate-100 bg-white p-3">
+              <div>
+                <p className="text-sm font-medium text-slate-900">{h.name}</p>
+                <p className="text-xs text-slate-500">{h.date}</p>
+              </div>
+              <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${HOLIDAY_TYPE_COLORS[h.type]}`}>
+                {HOLIDAY_TYPE_LABELS[h.type]}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-semibold text-slate-700 mb-3">
+          This Month ({now.toLocaleString('default', { month: 'long', year: 'numeric' })})
+        </h3>
+        {monthHolidays.length === 0 ? (
+          <p className="text-sm text-slate-400">No holidays this month</p>
+        ) : (
+          <div className="space-y-2">
+            {monthHolidays.map((h, i) => (
+              <div key={i} className="flex items-center justify-between rounded-lg border border-slate-100 bg-white p-3">
+                <div>
+                  <p className="text-sm font-medium text-slate-900">{h.name}</p>
+                  <p className="text-xs text-slate-500">{h.date}</p>
+                </div>
+                <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${HOLIDAY_TYPE_COLORS[h.type]}`}>
+                  {HOLIDAY_TYPE_LABELS[h.type]}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function CaseAgeTab() {
   const [filingDate, setFilingDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -547,6 +640,7 @@ export default function Tools() {
           {activeTab === 'interest' && <InterestTab />}
           {activeTab === 'date-math' && <DateMathTab />}
           {activeTab === 'case-age' && <CaseAgeTab />}
+          {activeTab === 'holidays' && <HolidayTab />}
         </CardContent>
       </Card>
 

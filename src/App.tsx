@@ -26,6 +26,8 @@ import Subscribe from '@/pages/Subscribe'
 import PaymentStatus from '@/pages/PaymentStatus'
 import Legal from '@/pages/Legal'
 import LegalDrafter from '@/pages/LegalDrafter'
+import TimeTracking from '@/pages/TimeTracking'
+import Tasks from '@/pages/Tasks'
 import AdminDashboard from '@/pages/admin/AdminDashboard'
 import AdminUsers from '@/pages/admin/AdminUsers'
 import AdminSubscriptions from '@/pages/admin/AdminSubscriptions'
@@ -114,6 +116,8 @@ export default function App() {
           <Route path="/clients/new" element={<SubscriptionGuard><NewClient /></SubscriptionGuard>} />
           <Route path="/clients/:id" element={<SubscriptionGuard><ClientDetail /></SubscriptionGuard>} />
           <Route path="/courts" element={<SubscriptionGuard><Courts /></SubscriptionGuard>} />
+          <Route path="/time" element={<SubscriptionGuard><TimeTracking /></SubscriptionGuard>} />
+          <Route path="/tasks" element={<SubscriptionGuard><Tasks /></SubscriptionGuard>} />
           <Route path="/settings" element={<SubscriptionGuard><Settings /></SubscriptionGuard>} />
         </Route>
 

@@ -16,11 +16,15 @@ import {
   Shield,
   CreditCard,
   Download,
+  Clock,
+  CheckSquare,
 } from 'lucide-react'
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/diary', icon: BookOpen, label: 'Case Diary' },
+  { to: '/tasks', icon: CheckSquare, label: 'Tasks' },
+  { to: '/time', icon: Clock, label: 'Time Tracking' },
   { to: '/cases', icon: Briefcase, label: 'Cases' },
   { to: '/clients', icon: Users, label: 'Clients' },
   { to: '/courts', icon: Building2, label: 'Court Directory' },

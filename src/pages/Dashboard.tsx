@@ -13,6 +13,8 @@ import {
   ArrowUpRight,
   X,
   AlertTriangle,
+  CheckSquare,
+  Clock,
 } from 'lucide-react'
 import type { DashboardStats, DiaryEntry } from '@/types'
 
@@ -48,6 +50,10 @@ export default function Dashboard() {
     setTodayEntries(entries)
   }
 
+  const todaysTimeFormatted = stats.todays_time_minutes > 0
+    ? `${Math.floor(stats.todays_time_minutes / 60)}h ${stats.todays_time_minutes % 60}m`
+    : '0h'
+
   const statCards = [
     {
       label: 'Total Cases',
@@ -68,10 +74,22 @@ export default function Dashboard() {
       color: 'text-amber-600 bg-amber-50',
     },
     {
+      label: 'Pending Tasks',
+      value: stats.pending_tasks,
+      icon: CheckSquare,
+      color: 'text-orange-600 bg-orange-50',
+    },
+    {
       label: 'Total Clients',
       value: stats.total_clients,
       icon: Users,
       color: 'text-purple-600 bg-purple-50',
+    },
+    {
+      label: "Today's Time",
+      value: todaysTimeFormatted,
+      icon: Clock,
+      color: 'text-teal-600 bg-teal-50',
     },
   ]
 
@@ -102,7 +120,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {statCards.map((card) => (
           <Card key={card.label}>
             <CardContent className="flex items-center gap-4 p-5">
@@ -127,6 +145,24 @@ export default function Dashboard() {
             </div>
             <p className="text-sm font-bold text-[#c9a84c]">AI Legal Drafter</p>
             <p className="mt-0.5 text-[11px] text-[#5a8ab5]">Generate petitions & drafts</p>
+          </div>
+        </Link>
+        <Link to="/time" className="block">
+          <div className="rounded-lg border border-slate-200 bg-white p-4 transition-all hover:shadow-md">
+            <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-lg text-blue-600 shadow">
+              ⏱️
+            </div>
+            <p className="text-sm font-bold text-slate-900">Time Tracking</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">Track billable hours</p>
+          </div>
+        </Link>
+        <Link to="/tasks" className="block">
+          <div className="rounded-lg border border-slate-200 bg-white p-4 transition-all hover:shadow-md">
+            <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-lg text-blue-600 shadow">
+              ✅
+            </div>
+            <p className="text-sm font-bold text-slate-900">Tasks</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">Manage your to-dos</p>
           </div>
         </Link>
         <Link to="/tools" className="block">

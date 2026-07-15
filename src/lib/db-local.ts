@@ -9,6 +9,8 @@ import type {
   Document,
   CaseParty,
   DashboardStats,
+  TimeEntry,
+  Task,
 } from '@/types'
 
 const PREFIX = 'ld:'
@@ -263,6 +265,83 @@ export const localDb = {
     return allCases.filter((c) => caseIds.includes(c.id))
   },
 
+  // ===== Time Entries =====
+
+  async getTimeEntries(date?: string): Promise<TimeEntry[]> {
+    const all = getCollection<TimeEntry>('time_entries')
+    if (date) return all.filter(e => e.date === date).sort((a, b) => a.start_time.localeCompare(b.start_time))
+    return all.sort((a, b) => b.start_time.localeCompare(a.start_time))
+  },
+
+  async getTimeEntriesByDateRange(fromDate: string, toDate: string): Promise<TimeEntry[]> {
+    const all = getCollection<TimeEntry>('time_entries')
+    return all.filter(e => e.date >= fromDate && e.date <= toDate).sort((a, b) => a.start_time.localeCompare(b.start_time))
+  },
+
+  async getTodaysTimeEntries(): Promise<TimeEntry[]> {
+    const today = new Date().toISOString().split('T')[0]
+    return this.getTimeEntries(today)
+  },
+
+  async createTimeEntry(entry: TimeEntry): Promise<string> {
+    const all = getCollection<TimeEntry>('time_entries')
+    all.push(entry)
+    saveCollection('time_entries', all)
+    return entry.id
+  },
+
+  async updateTimeEntry(entry: TimeEntry): Promise<void> {
+    const all = getCollection<TimeEntry>('time_entries')
+    const idx = all.findIndex(e => e.id === entry.id)
+    if (idx !== -1) {
+      all[idx] = { ...entry, updated_at: new Date().toISOString() }
+      saveCollection('time_entries', all)
+    }
+  },
+
+  async deleteTimeEntry(id: string): Promise<void> {
+    const all = getCollection<TimeEntry>('time_entries')
+    saveCollection('time_entries', all.filter(e => e.id !== id))
+  },
+
+  // ===== Tasks =====
+
+  async getTasks(status?: string): Promise<Task[]> {
+    const all = getCollection<Task>('tasks')
+    let filtered = all
+    if (status) filtered = all.filter(t => t.status === status)
+    return filtered.sort((a, b) => {
+      const prio = { urgent: 0, high: 1, medium: 2, low: 3 }
+      return (prio[a.priority] ?? 99) - (prio[b.priority] ?? 99)
+    })
+  },
+
+  async getTasksByCase(caseId: string): Promise<Task[]> {
+    const all = getCollection<Task>('tasks')
+    return all.filter(t => t.case_id === caseId)
+  },
+
+  async createTask(task: Task): Promise<string> {
+    const all = getCollection<Task>('tasks')
+    all.push(task)
+    saveCollection('tasks', all)
+    return task.id
+  },
+
+  async updateTask(task: Task): Promise<void> {
+    const all = getCollection<Task>('tasks')
+    const idx = all.findIndex(t => t.id === task.id)
+    if (idx !== -1) {
+      all[idx] = { ...task, updated_at: new Date().toISOString() }
+      saveCollection('tasks', all)
+    }
+  },
+
+  async deleteTask(id: string): Promise<void> {
+    const all = getCollection<Task>('tasks')
+    saveCollection('tasks', all.filter(t => t.id !== id))
+  },
+
   // ===== Batch Replace (for cloud sync) =====
 
   replaceCases(cases: Case[]): void { saveCollection('cases', cases) },
@@ -271,6 +350,8 @@ export const localDb = {
   replaceProceedings(proceedings: Proceeding[]): void { saveCollection('proceedings', proceedings) },
   replaceParties(parties: CaseParty[]): void { saveCollection('parties', parties) },
   replaceDocuments(docs: Document[]): void { saveCollection('documents', docs) },
+  replaceTimeEntries(entries: TimeEntry[]): void { saveCollection('time_entries', entries) },
+  replaceTasks(tasks: Task[]): void { saveCollection('tasks', tasks) },
 
   replaceAll(data: {
     cases?: Case[]
@@ -279,6 +360,8 @@ export const localDb = {
     proceedings?: Proceeding[]
     parties?: CaseParty[]
     documents?: Document[]
+    time_entries?: TimeEntry[]
+    tasks?: Task[]
   }): void {
     if (data.cases) this.replaceCases(data.cases)
     if (data.clients) this.replaceClients(data.clients)
@@ -286,6 +369,8 @@ export const localDb = {
     if (data.proceedings) this.replaceProceedings(data.proceedings)
     if (data.parties) this.replaceParties(data.parties)
     if (data.documents) this.replaceDocuments(data.documents)
+    if (data.time_entries) this.replaceTimeEntries(data.time_entries)
+    if (data.tasks) this.replaceTasks(data.tasks)
   },
 
   // ===== Dashboard =====
@@ -294,6 +379,8 @@ export const localDb = {
     const cases = getCollection<Case>('cases')
     const clients = getCollection<Client>('clients')
     const diary = getCollection<DiaryEntry>('diary_entries')
+    const tasks = getCollection<Task>('tasks')
+    const timeEntries = getCollection<TimeEntry>('time_entries')
     const today = new Date().toISOString().split('T')[0]
 
     return {
@@ -302,6 +389,8 @@ export const localDb = {
       today_hearings: diary.filter((e) => e.date === today).length,
       upcoming_hearings: diary.filter((e) => e.date > today).length,
       total_clients: clients.length,
+      pending_tasks: tasks.filter((t) => t.status !== 'completed' && t.status !== 'cancelled').length,
+      todays_time_minutes: timeEntries.filter((e) => e.date === today).reduce((sum, e) => sum + (e.duration_minutes || 0), 0),
     }
   },
 }

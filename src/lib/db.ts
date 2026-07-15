@@ -11,6 +11,8 @@ import type {
   Document,
   CaseParty,
   DashboardStats,
+  TimeEntry,
+  Task,
 } from '@/types'
 
 let isOnline = false
@@ -348,6 +350,95 @@ export const db = {
     return localDb.getProfileByPhone(phone)
   },
 
+  // ===== Time Entries =====
+
+  async getTimeEntries(date?: string): Promise<TimeEntry[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getTimeEntries(date) } catch { /* fall through */ }
+    }
+    return localDb.getTimeEntries(date)
+  },
+
+  async getTimeEntriesByDateRange(fromDate: string, toDate: string): Promise<TimeEntry[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getTimeEntriesByDateRange(fromDate, toDate) } catch { /* fall through */ }
+    }
+    return localDb.getTimeEntriesByDateRange(fromDate, toDate)
+  },
+
+  async getTodaysTimeEntries(): Promise<TimeEntry[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getTodaysTimeEntries() } catch { /* fall through */ }
+    }
+    return localDb.getTodaysTimeEntries()
+  },
+
+  async createTimeEntry(entry: TimeEntry): Promise<string> {
+    if (isOnline) {
+      try {
+        const id = await supabaseDb.createTimeEntry(entry)
+        localDb.createTimeEntry({ ...entry, id })
+        return id
+      } catch { /* fall through */ }
+    }
+    return localDb.createTimeEntry(entry)
+  },
+
+  async updateTimeEntry(entry: TimeEntry): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.updateTimeEntry(entry); return } catch { /* fall through */ }
+    }
+    return localDb.updateTimeEntry(entry)
+  },
+
+  async deleteTimeEntry(id: string): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.deleteTimeEntry(id); return } catch { /* fall through */ }
+    }
+    return localDb.deleteTimeEntry(id)
+  },
+
+  // ===== Tasks =====
+
+  async getTasks(status?: string): Promise<Task[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getTasks(status) } catch { /* fall through */ }
+    }
+    return localDb.getTasks(status)
+  },
+
+  async getTasksByCase(caseId: string): Promise<Task[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getTasksByCase(caseId) } catch { /* fall through */ }
+    }
+    return localDb.getTasksByCase(caseId)
+  },
+
+  async createTask(task: Task): Promise<string> {
+    if (isOnline) {
+      try {
+        const id = await supabaseDb.createTask(task)
+        localDb.createTask({ ...task, id })
+        return id
+      } catch { /* fall through */ }
+    }
+    return localDb.createTask(task)
+  },
+
+  async updateTask(task: Task): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.updateTask(task); return } catch { /* fall through */ }
+    }
+    return localDb.updateTask(task)
+  },
+
+  async deleteTask(id: string): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.deleteTask(id); return } catch { /* fall through */ }
+    }
+    return localDb.deleteTask(id)
+  },
+
   replaceAll(data: {
     cases?: Case[]
     clients?: Client[]
@@ -355,6 +446,8 @@ export const db = {
     proceedings?: Proceeding[]
     parties?: CaseParty[]
     documents?: Document[]
+    time_entries?: TimeEntry[]
+    tasks?: Task[]
   }): void {
     localDb.replaceAll(data)
   },

@@ -108,6 +108,8 @@ export interface DashboardStats {
   today_hearings: number
   upcoming_hearings: number
   total_clients: number
+  pending_tasks: number
+  todays_time_minutes: number
 }
 
 export interface SubscriptionPlan {
@@ -234,6 +236,41 @@ export interface PlanPriceHistory {
   change_reason: string
   applied_by: string | null
   created_at: string
+}
+
+export interface TimeEntry {
+  id: string
+  user_id?: string
+  case_id: string | null
+  description: string
+  start_time: string
+  end_time: string | null
+  duration_minutes: number | null
+  billable_rate: number | null
+  is_billable: boolean
+  date: string
+  created_at?: string
+  updated_at?: string
+}
+
+export interface Task {
+  id: string
+  user_id?: string
+  case_id: string | null
+  title: string
+  description: string | null
+  due_date: string | null
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled'
+  assigned_to: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface CourtHoliday {
+  date: string
+  name: string
+  type: 'public' | 'court' | 'religious'
 }
 
 export interface ValidationResult {

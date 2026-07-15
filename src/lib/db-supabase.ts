@@ -11,6 +11,8 @@ import type {
   PaymentMethod,
   PaymentRequest,
   PlanPriceHistory,
+  TimeEntry,
+  Task,
 } from '@/types'
 
 export const supabaseDb = {
@@ -495,19 +497,23 @@ export const supabaseDb = {
   async getDashboardStats(): Promise<DashboardStats> {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user?.id) {
-      return { total_cases: 0, active_cases: 0, today_hearings: 0, upcoming_hearings: 0, total_clients: 0 }
+      return { total_cases: 0, active_cases: 0, today_hearings: 0, upcoming_hearings: 0, total_clients: 0, pending_tasks: 0, todays_time_minutes: 0 }
     }
 
     const today = new Date().toISOString().split('T')[0]
     const userId = user.id
 
-    const [{ count: totalCases }, { count: activeCases }, { count: todayHearings }, { count: upcomingHearings }, { count: totalClients }] = await Promise.all([
+    const [{ count: totalCases }, { count: activeCases }, { count: todayHearings }, { count: upcomingHearings }, { count: totalClients }, { count: pendingTasks }, timeEntries] = await Promise.all([
       supabase.from('cases').select('*', { count: 'exact', head: true }).eq('user_id', userId),
       supabase.from('cases').select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'Active'),
       supabase.from('diary_entries').select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('date', today),
       supabase.from('diary_entries').select('*', { count: 'exact', head: true }).eq('user_id', userId).gt('date', today),
       supabase.from('clients').select('*', { count: 'exact', head: true }).eq('user_id', userId),
+      supabase.from('tasks').select('*', { count: 'exact', head: true }).eq('user_id', userId).not('status', 'in', '("completed","cancelled")'),
+      supabase.from('time_entries').select('duration_minutes').eq('user_id', userId).eq('date', today),
     ])
+
+    const todaysTimeMinutes = (timeEntries.data || []).reduce((sum: number, e: any) => sum + (e.duration_minutes || 0), 0)
 
     return {
       total_cases: totalCases ?? 0,
@@ -515,7 +521,172 @@ export const supabaseDb = {
       today_hearings: todayHearings ?? 0,
       upcoming_hearings: upcomingHearings ?? 0,
       total_clients: totalClients ?? 0,
+      pending_tasks: pendingTasks ?? 0,
+      todays_time_minutes: todaysTimeMinutes,
     }
+  },
+
+  // ===== Time Entries =====
+
+  async getTimeEntries(date?: string): Promise<TimeEntry[]> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return []
+
+    let query = supabase
+      .from('time_entries')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('start_time', { ascending: false })
+      .limit(100)
+
+    if (date) query = query.eq('date', date)
+
+    const { data, error } = await query
+    if (error) throw error
+    return (data || []).map(normalizeTimeEntry)
+  },
+
+  async getTimeEntriesByDateRange(fromDate: string, toDate: string): Promise<TimeEntry[]> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return []
+
+    const { data, error } = await supabase
+      .from('time_entries')
+      .select('*')
+      .eq('user_id', user.id)
+      .gte('date', fromDate)
+      .lte('date', toDate)
+      .order('start_time', { ascending: true })
+
+    if (error) throw error
+    return (data || []).map(normalizeTimeEntry)
+  },
+
+  async getTodaysTimeEntries(): Promise<TimeEntry[]> {
+    const today = new Date().toISOString().split('T')[0]
+    return this.getTimeEntries(today)
+  },
+
+  async createTimeEntry(entry: TimeEntry): Promise<string> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) throw new Error('Not authenticated')
+
+    const { data, error } = await supabase
+      .from('time_entries')
+      .insert({
+        id: entry.id,
+        user_id: user.id,
+        case_id: entry.case_id,
+        description: entry.description,
+        start_time: entry.start_time,
+        end_time: entry.end_time,
+        duration_minutes: entry.duration_minutes,
+        billable_rate: entry.billable_rate,
+        is_billable: entry.is_billable,
+        date: entry.date,
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return data.id
+  },
+
+  async updateTimeEntry(entry: TimeEntry): Promise<void> {
+    const { error } = await supabase
+      .from('time_entries')
+      .update({
+        case_id: entry.case_id,
+        description: entry.description,
+        start_time: entry.start_time,
+        end_time: entry.end_time,
+        duration_minutes: entry.duration_minutes,
+        billable_rate: entry.billable_rate,
+        is_billable: entry.is_billable,
+        date: entry.date,
+      })
+      .eq('id', entry.id)
+    if (error) throw error
+  },
+
+  async deleteTimeEntry(id: string): Promise<void> {
+    const { error } = await supabase.from('time_entries').delete().eq('id', id)
+    if (error) throw error
+  },
+
+  // ===== Tasks =====
+
+  async getTasks(status?: string): Promise<Task[]> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return []
+
+    let query = supabase
+      .from('tasks')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (status) query = query.eq('status', status)
+
+    const { data, error } = await query
+    if (error) throw error
+    return (data || []).map(normalizeTask)
+  },
+
+  async getTasksByCase(caseId: string): Promise<Task[]> {
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('case_id', caseId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return (data || []).map(normalizeTask)
+  },
+
+  async createTask(task: Task): Promise<string> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) throw new Error('Not authenticated')
+
+    const { data, error } = await supabase
+      .from('tasks')
+      .insert({
+        id: task.id,
+        user_id: user.id,
+        case_id: task.case_id,
+        title: task.title,
+        description: task.description,
+        due_date: task.due_date,
+        priority: task.priority,
+        status: task.status,
+        assigned_to: task.assigned_to,
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return data.id
+  },
+
+  async updateTask(task: Task): Promise<void> {
+    const { error } = await supabase
+      .from('tasks')
+      .update({
+        case_id: task.case_id,
+        title: task.title,
+        description: task.description,
+        due_date: task.due_date,
+        priority: task.priority,
+        status: task.status,
+        assigned_to: task.assigned_to,
+      })
+      .eq('id', task.id)
+    if (error) throw error
+  },
+
+  async deleteTask(id: string): Promise<void> {
+    const { error } = await supabase.from('tasks').delete().eq('id', id)
+    if (error) throw error
   },
 
   // ===== Payment Methods (Admin) =====
@@ -772,6 +943,39 @@ function normalizeDiaryEntry(data: Record<string, unknown>): DiaryEntry {
     remarks: data.remarks as string | null,
     reminder_minutes: data.reminder_minutes as number | null,
     reminder_sent: data.reminder_sent as boolean,
+    created_at: data.created_at as string | undefined,
+    updated_at: data.updated_at as string | undefined,
+  }
+}
+
+function normalizeTimeEntry(data: Record<string, unknown>): TimeEntry {
+  return {
+    id: data.id as string,
+    user_id: data.user_id as string,
+    case_id: data.case_id as string | null,
+    description: data.description as string,
+    start_time: data.start_time as string,
+    end_time: data.end_time as string | null,
+    duration_minutes: data.duration_minutes as number | null,
+    billable_rate: data.billable_rate as number | null,
+    is_billable: data.is_billable as boolean,
+    date: data.date as string,
+    created_at: data.created_at as string | undefined,
+    updated_at: data.updated_at as string | undefined,
+  }
+}
+
+function normalizeTask(data: Record<string, unknown>): Task {
+  return {
+    id: data.id as string,
+    user_id: data.user_id as string,
+    case_id: data.case_id as string | null,
+    title: data.title as string,
+    description: data.description as string | null,
+    due_date: data.due_date as string | null,
+    priority: data.priority as Task['priority'],
+    status: data.status as Task['status'],
+    assigned_to: data.assigned_to as string | null,
     created_at: data.created_at as string | undefined,
     updated_at: data.updated_at as string | undefined,
   }
