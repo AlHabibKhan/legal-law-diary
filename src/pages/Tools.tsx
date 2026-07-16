@@ -627,7 +627,7 @@ export default function Tools() {
         ))}
       </div>
 
-      <AdBanner adKey="TOOLS_TOP" height={90} width={728} className="mx-auto" />
+      <AdBanner adKey="xpdt49gn" height={90} width={728} className="mx-auto" />
 
       {/* Active Tab Content */}
       <Card>
@@ -644,7 +644,7 @@ export default function Tools() {
         </CardContent>
       </Card>
 
-      <AdBanner adKey="TOOLS_BANNER" height={250} width={300} className="mx-auto" />
+      <AdBanner adKey="xpdt49gn" height={250} width={300} className="mx-auto" />
     </div>
   )
 }

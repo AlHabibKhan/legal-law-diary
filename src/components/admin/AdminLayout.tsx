@@ -69,7 +69,7 @@ export function AdminLayout() {
 
       <main className="flex-1 overflow-y-auto bg-slate-50 p-6">
         <Outlet />
-        <AdBanner adKey="ADMIN_BANNER" height={90} width={728} className="mt-6 mx-auto" />
+        <AdBanner adKey="xpdt49gn" height={90} width={728} className="mt-6 mx-auto" />
       </main>
     </div>
   )

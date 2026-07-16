@@ -57,7 +57,7 @@ export default function Landing() {
           </p>
         </div>
 
-        <AdBanner adKey="LANDING_MID" height={90} width={728} className="w-full max-w-2xl mx-auto" />
+        <AdBanner adKey="xpdt49gn" height={90} width={728} className="w-full max-w-2xl mx-auto" />
 
         {/* Benefits */}
         <div className="w-full">
@@ -143,7 +143,7 @@ export default function Landing() {
           })}
         </div>
 
-        <AdBanner adKey="LANDING_BANNER" height={90} width={728} className="w-full max-w-2xl mx-auto" />
+        <AdBanner adKey="xpdt49gn" height={90} width={728} className="w-full max-w-2xl mx-auto" />
 
         {/* FAQ Section */}
         <div className="w-full">

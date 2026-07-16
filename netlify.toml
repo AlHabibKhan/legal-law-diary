@@ -5,6 +5,7 @@
 [build.environment]
   VITE_SUPABASE_URL = "https://lbkckyglffwmejxadaik.supabase.co"
   VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxia2NreWdsZmZ3bWVqeGFkYWlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5MzgzNDcsImV4cCI6MjA5NzUxNDM0N30.uyrdTNHqQfSV2TUI1HzRagWXSlk_HQF7ps39FCtEoOo"
+  VITE_ADSTERRA_BASE = "www.effectivecpmnetwork.com"
   # VITE_GEMINI_API_KEY — set this in Netlify UI: Site > Build & Deploy > Environment"
 
 [[redirects]]

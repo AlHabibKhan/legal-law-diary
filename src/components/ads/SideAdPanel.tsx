@@ -29,7 +29,7 @@ export function SideAdPanel({ side }: SideAdPanelProps) {
         </p>
 
         <AdBanner
-          adKey="SIDE_PANEL"
+          adKey="xpdt49gn"
           height={600}
           width={300}
           className="mb-3"
@@ -53,7 +53,7 @@ export function SideAdPanel({ side }: SideAdPanelProps) {
         </div>
 
         <div className="pt-2">
-          <AdBanner adKey="SIDE_PANEL_BOTTOM" height={250} width={300} />
+          <AdBanner adKey="xpdt49gn" height={250} width={300} />
         </div>
       </div>
 

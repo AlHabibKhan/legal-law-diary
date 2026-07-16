@@ -326,7 +326,7 @@ export default function Login() {
           </p>
         </div>
 
-        <AdBanner adKey="LOGIN_BANNER" height={250} width={300} className="mx-auto" />
+        <AdBanner adKey="xpdt49gn" height={250} width={300} className="mx-auto" />
 
         <p className="text-center text-sm text-slate-500">
           New here?{' '}

@@ -395,7 +395,7 @@ export default function Register() {
           </button>
         </div>
 
-        <AdBanner adKey="REGISTER_TOP" height={90} width={728} className="mx-auto mb-2" />
+        <AdBanner adKey="xpdt49gn" height={90} width={728} className="mx-auto mb-2" />
 
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           {step === 1 && renderStep1()}
@@ -520,7 +520,7 @@ export default function Register() {
           )}
         </div>
 
-        <AdBanner adKey="REGISTER_BANNER" height={250} width={300} className="mx-auto" />
+        <AdBanner adKey="xpdt49gn" height={250} width={300} className="mx-auto" />
 
         <p className="text-center text-sm text-slate-500">
           Already have an account?{' '}
