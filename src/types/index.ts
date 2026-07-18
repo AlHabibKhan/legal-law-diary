@@ -112,6 +112,33 @@ export interface DashboardStats {
   todays_time_minutes: number
 }
 
+export interface PersonalNote {
+  id: string
+  user_id?: string
+  title: string
+  content: string
+  category: string | null
+  case_id: string | null
+  tags: string[] | null
+  pinned: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export interface LegalReference {
+  id: string
+  user_id?: string
+  title: string
+  reference_type: 'Statute' | 'Act' | 'Ordinance' | 'Rules' | 'Regulation' | 'Treaty' | 'Other'
+  jurisdiction: string | null
+  year: number | null
+  description: string | null
+  content_text: string | null
+  tags: string[] | null
+  created_at?: string
+  updated_at?: string
+}
+
 export interface SubscriptionPlan {
   id: string
   name: string
@@ -238,6 +265,49 @@ export interface PlanPriceHistory {
   created_at: string
 }
 
+export interface Notice {
+  id: string
+  case_id: string
+  notice_type: 'Legal Notice' | 'Court Notice' | 'Show Cause' | 'Demand Notice' | 'Other'
+  issued_to: string
+  issued_date: string
+  served_date: string | null
+  status: 'Draft' | 'Issued' | 'Served' | 'Returned' | 'Complied'
+  content: string | null
+  remarks: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface Summons {
+  id: string
+  case_id: string
+  summons_type: 'Witness' | 'Defendant' | 'Document Production' | 'Expert' | 'Other'
+  issued_to: string
+  issued_date: string
+  return_date: string | null
+  hearing_date: string | null
+  status: 'Draft' | 'Issued' | 'Served' | 'Returned' | 'Complied'
+  remarks: string | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface OrderCopyRequest {
+  id: string
+  case_id: string
+  order_date: string
+  order_summary: string | null
+  applied_date: string
+  status: 'Draft' | 'Applied' | 'Processing' | 'Ready' | 'Received'
+  court_fee: number | null
+  estimated_cost: number | null
+  received_date: string | null
+  remarks: string | null
+  created_at?: string
+  updated_at?: string
+}
+
 export interface TimeEntry {
   id: string
   user_id?: string
@@ -313,6 +383,18 @@ export const PARTY_TYPES = [
 ] as const
 
 export const DIVISIONS = ['Civil', 'Criminal'] as const
+
+export const NOTICE_TYPES = ['Legal Notice', 'Court Notice', 'Show Cause', 'Demand Notice', 'Other'] as const
+
+export const SUMMONS_TYPES = ['Witness', 'Defendant', 'Document Production', 'Expert', 'Other'] as const
+
+export const CLERICAL_STATUSES = ['Draft', 'Issued', 'Served', 'Returned', 'Complied'] as const
+
+export const ORDER_COPY_STATUSES = ['Draft', 'Applied', 'Processing', 'Ready', 'Received'] as const
+
+export const NOTE_CATEGORIES = ['General', 'Case Strategy', 'Legal Research', 'Client Notes', 'To-Do', 'Reference', 'Other'] as const
+
+export const REFERENCE_TYPES = ['Statute', 'Act', 'Ordinance', 'Rules', 'Regulation', 'Treaty', 'Other'] as const
 
 export const PROVINCES = [
   'Punjab',

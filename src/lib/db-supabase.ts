@@ -13,6 +13,11 @@ import type {
   PlanPriceHistory,
   TimeEntry,
   Task,
+  Notice,
+  Summons,
+  OrderCopyRequest,
+  PersonalNote,
+  LegalReference,
 } from '@/types'
 
 export const supabaseDb = {
@@ -689,6 +694,402 @@ export const supabaseDb = {
     if (error) throw error
   },
 
+  // ===== Personal Notes =====
+
+  async getPersonalNotes(category?: string): Promise<PersonalNote[]> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return []
+
+    let query = supabase
+      .from('personal_notes')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false })
+
+    if (category) query = query.eq('category', category)
+
+    const { data, error } = await query
+    if (error) throw error
+    return (data || []).map(normalizePersonalNote)
+  },
+
+  async getPersonalNote(id: string): Promise<PersonalNote | null> {
+    const { data, error } = await supabase
+      .from('personal_notes')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error || !data) return null
+    return normalizePersonalNote(data)
+  },
+
+  async searchPersonalNotes(query: string): Promise<PersonalNote[]> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return []
+
+    const { data, error } = await supabase
+      .from('personal_notes')
+      .select('*')
+      .eq('user_id', user.id)
+      .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
+      .order('updated_at', { ascending: false })
+
+    if (error) throw error
+    return (data || []).map(normalizePersonalNote)
+  },
+
+  async createPersonalNote(note: PersonalNote): Promise<string> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) throw new Error('Not authenticated')
+
+    const { data, error } = await supabase
+      .from('personal_notes')
+      .insert({
+        id: note.id,
+        user_id: user.id,
+        title: note.title,
+        content: note.content,
+        category: note.category,
+        case_id: note.case_id,
+        tags: note.tags,
+        pinned: note.pinned,
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return data.id
+  },
+
+  async updatePersonalNote(note: PersonalNote): Promise<void> {
+    const { error } = await supabase
+      .from('personal_notes')
+      .update({
+        title: note.title,
+        content: note.content,
+        category: note.category,
+        case_id: note.case_id,
+        tags: note.tags,
+        pinned: note.pinned,
+      })
+      .eq('id', note.id)
+    if (error) throw error
+  },
+
+  async deletePersonalNote(id: string): Promise<void> {
+    const { error } = await supabase.from('personal_notes').delete().eq('id', id)
+    if (error) throw error
+  },
+
+  // ===== Legal References =====
+
+  async getLegalReferences(type?: string): Promise<LegalReference[]> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return []
+
+    let query = supabase
+      .from('legal_references')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (type) query = query.eq('reference_type', type)
+
+    const { data, error } = await query
+    if (error) throw error
+    return (data || []).map(normalizeLegalReference)
+  },
+
+  async getLegalReference(id: string): Promise<LegalReference | null> {
+    const { data, error } = await supabase
+      .from('legal_references')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error || !data) return null
+    return normalizeLegalReference(data)
+  },
+
+  async searchLegalReferences(query: string): Promise<LegalReference[]> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return []
+
+    const { data, error } = await supabase
+      .from('legal_references')
+      .select('*')
+      .eq('user_id', user.id)
+      .or(`title.ilike.%${query}%,description.ilike.%${query}%,content_text.ilike.%${query}%`)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return (data || []).map(normalizeLegalReference)
+  },
+
+  async createLegalReference(ref: LegalReference): Promise<string> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) throw new Error('Not authenticated')
+
+    const { data, error } = await supabase
+      .from('legal_references')
+      .insert({
+        id: ref.id,
+        user_id: user.id,
+        title: ref.title,
+        reference_type: ref.reference_type,
+        jurisdiction: ref.jurisdiction,
+        year: ref.year,
+        description: ref.description,
+        content_text: ref.content_text,
+        tags: ref.tags,
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return data.id
+  },
+
+  async updateLegalReference(ref: LegalReference): Promise<void> {
+    const { error } = await supabase
+      .from('legal_references')
+      .update({
+        title: ref.title,
+        reference_type: ref.reference_type,
+        jurisdiction: ref.jurisdiction,
+        year: ref.year,
+        description: ref.description,
+        content_text: ref.content_text,
+        tags: ref.tags,
+      })
+      .eq('id', ref.id)
+    if (error) throw error
+  },
+
+  async deleteLegalReference(id: string): Promise<void> {
+    const { error } = await supabase.from('legal_references').delete().eq('id', id)
+    if (error) throw error
+  },
+
+  // ===== Notices =====
+
+  async createNotice(data: Notice): Promise<string> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) throw new Error('Not authenticated')
+
+    const { data: result, error } = await supabase
+      .from('notices')
+      .insert({
+        id: data.id,
+        user_id: user.id,
+        case_id: data.case_id,
+        notice_type: data.notice_type,
+        issued_to: data.issued_to,
+        issued_date: data.issued_date,
+        served_date: data.served_date,
+        status: data.status,
+        content: data.content,
+        remarks: data.remarks,
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return result.id
+  },
+
+  async getNotices(caseId: string): Promise<Notice[]> {
+    const { data, error } = await supabase
+      .from('notices')
+      .select('*')
+      .eq('case_id', caseId)
+      .order('issued_date', { ascending: false })
+
+    if (error) throw error
+    return (data || []).map(normalizeNotice)
+  },
+
+  async getAllNotices(): Promise<Notice[]> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return []
+    const { data, error } = await supabase
+      .from('notices')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('issued_date', { ascending: false })
+
+    if (error) throw error
+    return (data || []).map(normalizeNotice)
+  },
+
+  async updateNotice(data: Notice): Promise<void> {
+    const { error } = await supabase
+      .from('notices')
+      .update({
+        notice_type: data.notice_type,
+        issued_to: data.issued_to,
+        issued_date: data.issued_date,
+        served_date: data.served_date,
+        status: data.status,
+        content: data.content,
+        remarks: data.remarks,
+      })
+      .eq('id', data.id)
+    if (error) throw error
+  },
+
+  async deleteNotice(id: string): Promise<void> {
+    const { error } = await supabase.from('notices').delete().eq('id', id)
+    if (error) throw error
+  },
+
+  // ===== Summons =====
+
+  async createSummons(data: Summons): Promise<string> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) throw new Error('Not authenticated')
+
+    const { data: result, error } = await supabase
+      .from('summons')
+      .insert({
+        id: data.id,
+        user_id: user.id,
+        case_id: data.case_id,
+        summons_type: data.summons_type,
+        issued_to: data.issued_to,
+        issued_date: data.issued_date,
+        return_date: data.return_date,
+        hearing_date: data.hearing_date,
+        status: data.status,
+        remarks: data.remarks,
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return result.id
+  },
+
+  async getSummons(caseId: string): Promise<Summons[]> {
+    const { data, error } = await supabase
+      .from('summons')
+      .select('*')
+      .eq('case_id', caseId)
+      .order('issued_date', { ascending: false })
+
+    if (error) throw error
+    return (data || []).map(normalizeSummons)
+  },
+
+  async getAllSummons(): Promise<Summons[]> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return []
+    const { data, error } = await supabase
+      .from('summons')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('issued_date', { ascending: false })
+
+    if (error) throw error
+    return (data || []).map(normalizeSummons)
+  },
+
+  async updateSummons(data: Summons): Promise<void> {
+    const { error } = await supabase
+      .from('summons')
+      .update({
+        summons_type: data.summons_type,
+        issued_to: data.issued_to,
+        issued_date: data.issued_date,
+        return_date: data.return_date,
+        hearing_date: data.hearing_date,
+        status: data.status,
+        remarks: data.remarks,
+      })
+      .eq('id', data.id)
+    if (error) throw error
+  },
+
+  async deleteSummons(id: string): Promise<void> {
+    const { error } = await supabase.from('summons').delete().eq('id', id)
+    if (error) throw error
+  },
+
+  // ===== Order Copy Requests =====
+
+  async createOrderCopy(data: OrderCopyRequest): Promise<string> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) throw new Error('Not authenticated')
+
+    const { data: result, error } = await supabase
+      .from('order_copies')
+      .insert({
+        id: data.id,
+        user_id: user.id,
+        case_id: data.case_id,
+        order_date: data.order_date,
+        order_summary: data.order_summary,
+        applied_date: data.applied_date,
+        status: data.status,
+        court_fee: data.court_fee,
+        estimated_cost: data.estimated_cost,
+        received_date: data.received_date,
+        remarks: data.remarks,
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return result.id
+  },
+
+  async getOrderCopies(caseId: string): Promise<OrderCopyRequest[]> {
+    const { data, error } = await supabase
+      .from('order_copies')
+      .select('*')
+      .eq('case_id', caseId)
+      .order('applied_date', { ascending: false })
+
+    if (error) throw error
+    return (data || []).map(normalizeOrderCopy)
+  },
+
+  async getAllOrderCopies(): Promise<OrderCopyRequest[]> {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.id) return []
+    const { data, error } = await supabase
+      .from('order_copies')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('applied_date', { ascending: false })
+
+    if (error) throw error
+    return (data || []).map(normalizeOrderCopy)
+  },
+
+  async updateOrderCopy(data: OrderCopyRequest): Promise<void> {
+    const { error } = await supabase
+      .from('order_copies')
+      .update({
+        order_date: data.order_date,
+        order_summary: data.order_summary,
+        applied_date: data.applied_date,
+        status: data.status,
+        court_fee: data.court_fee,
+        estimated_cost: data.estimated_cost,
+        received_date: data.received_date,
+        remarks: data.remarks,
+      })
+      .eq('id', data.id)
+    if (error) throw error
+  },
+
+  async deleteOrderCopy(id: string): Promise<void> {
+    const { error } = await supabase.from('order_copies').delete().eq('id', id)
+    if (error) throw error
+  },
+
   // ===== Payment Methods (Admin) =====
 
   async getPaymentMethods(): Promise<PaymentMethod[]> {
@@ -976,6 +1377,86 @@ function normalizeTask(data: Record<string, unknown>): Task {
     priority: data.priority as Task['priority'],
     status: data.status as Task['status'],
     assigned_to: data.assigned_to as string | null,
+    created_at: data.created_at as string | undefined,
+    updated_at: data.updated_at as string | undefined,
+  }
+}
+
+function normalizeNotice(data: Record<string, unknown>): Notice {
+  return {
+    id: data.id as string,
+    case_id: data.case_id as string,
+    notice_type: data.notice_type as Notice['notice_type'],
+    issued_to: data.issued_to as string,
+    issued_date: data.issued_date as string,
+    served_date: data.served_date as string | null,
+    status: data.status as Notice['status'],
+    content: data.content as string | null,
+    remarks: data.remarks as string | null,
+    created_at: data.created_at as string | undefined,
+    updated_at: data.updated_at as string | undefined,
+  }
+}
+
+function normalizeSummons(data: Record<string, unknown>): Summons {
+  return {
+    id: data.id as string,
+    case_id: data.case_id as string,
+    summons_type: data.summons_type as Summons['summons_type'],
+    issued_to: data.issued_to as string,
+    issued_date: data.issued_date as string,
+    return_date: data.return_date as string | null,
+    hearing_date: data.hearing_date as string | null,
+    status: data.status as Summons['status'],
+    remarks: data.remarks as string | null,
+    created_at: data.created_at as string | undefined,
+    updated_at: data.updated_at as string | undefined,
+  }
+}
+
+function normalizeOrderCopy(data: Record<string, unknown>): OrderCopyRequest {
+  return {
+    id: data.id as string,
+    case_id: data.case_id as string,
+    order_date: data.order_date as string,
+    order_summary: data.order_summary as string | null,
+    applied_date: data.applied_date as string,
+    status: data.status as OrderCopyRequest['status'],
+    court_fee: data.court_fee as number | null,
+    estimated_cost: data.estimated_cost as number | null,
+    received_date: data.received_date as string | null,
+    remarks: data.remarks as string | null,
+    created_at: data.created_at as string | undefined,
+    updated_at: data.updated_at as string | undefined,
+  }
+}
+
+function normalizePersonalNote(data: Record<string, unknown>): PersonalNote {
+  return {
+    id: data.id as string,
+    user_id: data.user_id as string,
+    title: data.title as string,
+    content: data.content as string,
+    category: data.category as string | null,
+    case_id: data.case_id as string | null,
+    tags: data.tags as string[] | null,
+    pinned: data.pinned as boolean,
+    created_at: data.created_at as string | undefined,
+    updated_at: data.updated_at as string | undefined,
+  }
+}
+
+function normalizeLegalReference(data: Record<string, unknown>): LegalReference {
+  return {
+    id: data.id as string,
+    user_id: data.user_id as string,
+    title: data.title as string,
+    reference_type: data.reference_type as LegalReference['reference_type'],
+    jurisdiction: data.jurisdiction as string | null,
+    year: data.year as number | null,
+    description: data.description as string | null,
+    content_text: data.content_text as string | null,
+    tags: data.tags as string[] | null,
     created_at: data.created_at as string | undefined,
     updated_at: data.updated_at as string | undefined,
   }

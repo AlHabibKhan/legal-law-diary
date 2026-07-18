@@ -13,6 +13,11 @@ import type {
   DashboardStats,
   TimeEntry,
   Task,
+  Notice,
+  Summons,
+  OrderCopyRequest,
+  PersonalNote,
+  LegalReference,
 } from '@/types'
 
 let isOnline = false
@@ -92,6 +97,46 @@ async function cacheDocuments() {
       all.push(...d)
     }
     localDb.replaceDocuments(all)
+  } catch { /* ignore */ }
+}
+
+async function cacheNotices() {
+  if (!isOnline) return
+  try {
+    const data = await supabaseDb.getAllNotices()
+    localDb.replaceNotices(data)
+  } catch { /* ignore */ }
+}
+
+async function cacheSummons() {
+  if (!isOnline) return
+  try {
+    const data = await supabaseDb.getAllSummons()
+    localDb.replaceSummons(data)
+  } catch { /* ignore */ }
+}
+
+async function cacheOrderCopies() {
+  if (!isOnline) return
+  try {
+    const data = await supabaseDb.getAllOrderCopies()
+    localDb.replaceOrderCopies(data)
+  } catch { /* ignore */ }
+}
+
+async function cachePersonalNotes() {
+  if (!isOnline) return
+  try {
+    const data = await supabaseDb.getPersonalNotes()
+    localDb.replacePersonalNotes(data)
+  } catch { /* ignore */ }
+}
+
+async function cacheLegalReferences() {
+  if (!isOnline) return
+  try {
+    const data = await supabaseDb.getLegalReferences()
+    localDb.replaceLegalReferences(data)
   } catch { /* ignore */ }
 }
 
@@ -439,6 +484,225 @@ export const db = {
     return localDb.deleteTask(id)
   },
 
+  // ===== Personal Notes =====
+
+  async getPersonalNotes(category?: string): Promise<PersonalNote[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getPersonalNotes(category) } catch { /* fall through */ }
+    }
+    return localDb.getPersonalNotes(category)
+  },
+
+  async getPersonalNote(id: string): Promise<PersonalNote | null> {
+    if (isOnline) {
+      try { return await supabaseDb.getPersonalNote(id) } catch { /* fall through */ }
+    }
+    return localDb.getPersonalNote(id)
+  },
+
+  async searchPersonalNotes(query: string): Promise<PersonalNote[]> {
+    if (isOnline) {
+      try { return await supabaseDb.searchPersonalNotes(query) } catch { /* fall through */ }
+    }
+    return localDb.searchPersonalNotes(query)
+  },
+
+  async createPersonalNote(note: PersonalNote): Promise<string> {
+    if (isOnline) {
+      try {
+        const id = await supabaseDb.createPersonalNote(note)
+        localDb.createPersonalNote({ ...note, id })
+        return id
+      } catch { /* fall through */ }
+    }
+    return localDb.createPersonalNote(note)
+  },
+
+  async updatePersonalNote(note: PersonalNote): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.updatePersonalNote(note); return } catch { /* fall through */ }
+    }
+    return localDb.updatePersonalNote(note)
+  },
+
+  async deletePersonalNote(id: string): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.deletePersonalNote(id); return } catch { /* fall through */ }
+    }
+    return localDb.deletePersonalNote(id)
+  },
+
+  // ===== Legal References =====
+
+  async getLegalReferences(type?: string): Promise<LegalReference[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getLegalReferences(type) } catch { /* fall through */ }
+    }
+    return localDb.getLegalReferences(type)
+  },
+
+  async getLegalReference(id: string): Promise<LegalReference | null> {
+    if (isOnline) {
+      try { return await supabaseDb.getLegalReference(id) } catch { /* fall through */ }
+    }
+    return localDb.getLegalReference(id)
+  },
+
+  async searchLegalReferences(query: string): Promise<LegalReference[]> {
+    if (isOnline) {
+      try { return await supabaseDb.searchLegalReferences(query) } catch { /* fall through */ }
+    }
+    return localDb.searchLegalReferences(query)
+  },
+
+  async createLegalReference(ref: LegalReference): Promise<string> {
+    if (isOnline) {
+      try {
+        const id = await supabaseDb.createLegalReference(ref)
+        localDb.createLegalReference({ ...ref, id })
+        return id
+      } catch { /* fall through */ }
+    }
+    return localDb.createLegalReference(ref)
+  },
+
+  async updateLegalReference(ref: LegalReference): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.updateLegalReference(ref); return } catch { /* fall through */ }
+    }
+    return localDb.updateLegalReference(ref)
+  },
+
+  async deleteLegalReference(id: string): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.deleteLegalReference(id); return } catch { /* fall through */ }
+    }
+    return localDb.deleteLegalReference(id)
+  },
+
+  // ===== Notices =====
+
+  async createNotice(data: Notice): Promise<string> {
+    if (isOnline) {
+      try {
+        const id = await supabaseDb.createNotice(data)
+        localDb.createNotice({ ...data, id })
+        return id
+      } catch { /* fall through */ }
+    }
+    return localDb.createNotice(data)
+  },
+
+  async getNotices(caseId: string): Promise<Notice[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getNotices(caseId) } catch { /* fall through */ }
+    }
+    return localDb.getNotices(caseId)
+  },
+
+  async getAllNotices(): Promise<Notice[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getAllNotices() } catch { /* fall through */ }
+    }
+    return localDb.getAllNotices()
+  },
+
+  async updateNotice(data: Notice): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.updateNotice(data); return } catch { /* fall through */ }
+    }
+    return localDb.updateNotice(data)
+  },
+
+  async deleteNotice(id: string): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.deleteNotice(id); return } catch { /* fall through */ }
+    }
+    return localDb.deleteNotice(id)
+  },
+
+  // ===== Summons =====
+
+  async createSummons(data: Summons): Promise<string> {
+    if (isOnline) {
+      try {
+        const id = await supabaseDb.createSummons(data)
+        localDb.createSummons({ ...data, id })
+        return id
+      } catch { /* fall through */ }
+    }
+    return localDb.createSummons(data)
+  },
+
+  async getSummons(caseId: string): Promise<Summons[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getSummons(caseId) } catch { /* fall through */ }
+    }
+    return localDb.getSummons(caseId)
+  },
+
+  async getAllSummons(): Promise<Summons[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getAllSummons() } catch { /* fall through */ }
+    }
+    return localDb.getAllSummons()
+  },
+
+  async updateSummons(data: Summons): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.updateSummons(data); return } catch { /* fall through */ }
+    }
+    return localDb.updateSummons(data)
+  },
+
+  async deleteSummons(id: string): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.deleteSummons(id); return } catch { /* fall through */ }
+    }
+    return localDb.deleteSummons(id)
+  },
+
+  // ===== Order Copy Requests =====
+
+  async createOrderCopy(data: OrderCopyRequest): Promise<string> {
+    if (isOnline) {
+      try {
+        const id = await supabaseDb.createOrderCopy(data)
+        localDb.createOrderCopy({ ...data, id })
+        return id
+      } catch { /* fall through */ }
+    }
+    return localDb.createOrderCopy(data)
+  },
+
+  async getOrderCopies(caseId: string): Promise<OrderCopyRequest[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getOrderCopies(caseId) } catch { /* fall through */ }
+    }
+    return localDb.getOrderCopies(caseId)
+  },
+
+  async getAllOrderCopies(): Promise<OrderCopyRequest[]> {
+    if (isOnline) {
+      try { return await supabaseDb.getAllOrderCopies() } catch { /* fall through */ }
+    }
+    return localDb.getAllOrderCopies()
+  },
+
+  async updateOrderCopy(data: OrderCopyRequest): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.updateOrderCopy(data); return } catch { /* fall through */ }
+    }
+    return localDb.updateOrderCopy(data)
+  },
+
+  async deleteOrderCopy(id: string): Promise<void> {
+    if (isOnline) {
+      try { await supabaseDb.deleteOrderCopy(id); return } catch { /* fall through */ }
+    }
+    return localDb.deleteOrderCopy(id)
+  },
+
   replaceAll(data: {
     cases?: Case[]
     clients?: Client[]
@@ -448,6 +712,11 @@ export const db = {
     documents?: Document[]
     time_entries?: TimeEntry[]
     tasks?: Task[]
+    personal_notes?: PersonalNote[]
+    notices?: Notice[]
+    summons?: Summons[]
+    order_copies?: OrderCopyRequest[]
+    legal_references?: LegalReference[]
   }): void {
     localDb.replaceAll(data)
   },
@@ -473,6 +742,11 @@ export const db = {
       cacheProceedings(),
       cacheParties(),
       cacheDocuments(),
+      cacheNotices(),
+      cacheSummons(),
+      cacheOrderCopies(),
+      cachePersonalNotes(),
+      cacheLegalReferences(),
     ])
   },
 }

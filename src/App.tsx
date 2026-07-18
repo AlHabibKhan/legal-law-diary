@@ -31,6 +31,9 @@ import Guides from '@/pages/Guides'
 import GuideDetail from '@/pages/GuideDetail'
 import TimeTracking from '@/pages/TimeTracking'
 import Tasks from '@/pages/Tasks'
+import Clerical from '@/pages/Clerical'
+import Notes from '@/pages/Notes'
+import LawsLibrary from '@/pages/LawsLibrary'
 import AdminDashboard from '@/pages/admin/AdminDashboard'
 import AdminUsers from '@/pages/admin/AdminUsers'
 import AdminSubscriptions from '@/pages/admin/AdminSubscriptions'
@@ -124,6 +127,9 @@ export default function App() {
           <Route path="/courts" element={<SubscriptionGuard><Courts /></SubscriptionGuard>} />
           <Route path="/time" element={<SubscriptionGuard><TimeTracking /></SubscriptionGuard>} />
           <Route path="/tasks" element={<SubscriptionGuard><Tasks /></SubscriptionGuard>} />
+          <Route path="/notes" element={<SubscriptionGuard><Notes /></SubscriptionGuard>} />
+          <Route path="/laws" element={<SubscriptionGuard><LawsLibrary /></SubscriptionGuard>} />
+          <Route path="/clerical" element={<SubscriptionGuard><Clerical /></SubscriptionGuard>} />
           <Route path="/settings" element={<SubscriptionGuard><Settings /></SubscriptionGuard>} />
         </Route>
 

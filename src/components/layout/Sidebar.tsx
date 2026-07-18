@@ -18,6 +18,9 @@ import {
   Download,
   Clock,
   CheckSquare,
+  ScrollText,
+  StickyNote,
+  Library,
 } from 'lucide-react'
 
 const navItems = [
@@ -25,10 +28,13 @@ const navItems = [
   { to: '/diary', icon: BookOpen, label: 'Case Diary' },
   { to: '/tasks', icon: CheckSquare, label: 'Tasks' },
   { to: '/time', icon: Clock, label: 'Time Tracking' },
+  { to: '/notes', icon: StickyNote, label: 'Personal Notes' },
   { to: '/cases', icon: Briefcase, label: 'Cases' },
   { to: '/clients', icon: Users, label: 'Clients' },
+  { to: '/clerical', icon: ScrollText, label: 'Case Admin' },
   { to: '/courts', icon: Building2, label: 'Court Directory' },
   { to: '/tools', icon: Calculator, label: 'Tools' },
+  { to: '/laws', icon: Library, label: 'Laws & Statutes' },
   { to: '/pricing', icon: CreditCard, label: 'Subscription' },
   { to: '/settings', icon: Settings, label: 'Settings' },
   { to: '/settings', icon: Download, label: 'Data Backup' },

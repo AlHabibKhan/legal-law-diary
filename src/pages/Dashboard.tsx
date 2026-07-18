@@ -15,8 +15,9 @@ import {
   AlertTriangle,
   CheckSquare,
   Clock,
+  StickyNote,
 } from 'lucide-react'
-import type { DashboardStats, DiaryEntry } from '@/types'
+import type { DashboardStats, DiaryEntry, PersonalNote } from '@/types'
 
 export default function Dashboard() {
   const { profile } = useAuth()
@@ -30,6 +31,7 @@ export default function Dashboard() {
     todays_time_minutes: 0,
   })
   const [todayEntries, setTodayEntries] = useState<DiaryEntry[]>([])
+  const [recentNotes, setRecentNotes] = useState<PersonalNote[]>([])
   const [showBackupBanner, setShowBackupBanner] = useState(false)
 
   useEffect(() => {
@@ -50,6 +52,8 @@ export default function Dashboard() {
     setStats(s)
     const entries = await db.getDiaryEntries(getTodayDate())
     setTodayEntries(entries)
+    const notes = await db.getPersonalNotes()
+    setRecentNotes(notes.slice(0, 5))
   }
 
   const todaysTimeFormatted = stats.todays_time_minutes > 0
@@ -177,6 +181,39 @@ export default function Dashboard() {
           </div>
         </Link>
       </div>
+
+      {recentNotes.length > 0 && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Recent Notes</CardTitle>
+            <a href="/notes" className="text-xs font-medium text-blue-600 hover:underline">
+              View all
+            </a>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recentNotes.map((note) => (
+                <a
+                  key={note.id}
+                  href="/notes"
+                  className="flex items-start gap-3 rounded-lg border border-slate-100 p-3 transition-colors hover:bg-slate-50"
+                >
+                  <StickyNote size={16} className="mt-0.5 shrink-0 text-slate-400" />
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-slate-900">{note.title}</p>
+                    <p className="truncate text-xs text-slate-500">{note.content}</p>
+                    {note.category && (
+                      <span className="mt-1 inline-block rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">
+                        {note.category}
+                      </span>
+                    )}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>

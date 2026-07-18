@@ -8,15 +8,18 @@ import { Select } from '@/components/ui/select'
 import { ProceedingList } from '@/components/ProceedingList'
 import { CaseParties } from '@/components/CaseParties'
 import { Documents } from '@/components/Documents'
+import { ClericalNotices } from '@/components/ClericalNotices'
+import { ClericalSummons } from '@/components/ClericalSummons'
+import { ClericalOrderCopies } from '@/components/ClericalOrderCopies'
 import { ArrowLeft, Edit2, Save, X, Loader2, Download } from 'lucide-react'
 import { formatDate, generateId } from '@/lib/utils'
 import { db } from '@/lib/db'
 import { exportCasePdf } from '@/lib/pdf-export'
 import { getPakistaniCourts } from '@/lib/court-data'
 import { CASE_STATUSES, DIVISIONS } from '@/types'
-import type { Case, Proceeding, CaseParty, Document } from '@/types'
+import type { Case, Proceeding, CaseParty, Document, Notice, Summons, OrderCopyRequest } from '@/types'
 
-type Tab = 'info' | 'parties' | 'proceedings' | 'documents'
+type Tab = 'info' | 'parties' | 'proceedings' | 'documents' | 'clerical'
 
 export default function CaseDetail() {
   const { id } = useParams()
@@ -29,6 +32,9 @@ export default function CaseDetail() {
   const [proceedings, setProceedings] = useState<Proceeding[]>([])
   const [parties, setParties] = useState<CaseParty[]>([])
   const [documents, setDocuments] = useState<Document[]>([])
+  const [notices, setNotices] = useState<Notice[]>([])
+  const [summons, setSummons] = useState<Summons[]>([])
+  const [orderCopies, setOrderCopies] = useState<OrderCopyRequest[]>([])
   const [editForm, setEditForm] = useState<Case | null>(null)
 
   useEffect(() => {
@@ -42,14 +48,20 @@ export default function CaseDetail() {
       setCaseData(c)
       setEditForm({ ...c })
     }
-    const [proc, prt, docs] = await Promise.all([
+    const [proc, prt, docs, n, s, o] = await Promise.all([
       db.getProceedings(id!),
       db.getCaseParties(id!),
       db.getCaseDocuments(id!),
+      db.getNotices(id!),
+      db.getSummons(id!),
+      db.getOrderCopies(id!),
     ])
     setProceedings(proc)
     setParties(prt)
     setDocuments(docs)
+    setNotices(n)
+    setSummons(s)
+    setOrderCopies(o)
     setLoading(false)
   }
 
@@ -58,6 +70,7 @@ export default function CaseDetail() {
     { key: 'parties', label: 'Parties', count: parties.length },
     { key: 'proceedings', label: 'Proceedings', count: proceedings.length },
     { key: 'documents', label: 'Documents', count: documents.length },
+    { key: 'clerical', label: 'Clerical', count: notices.length + summons.length + orderCopies.length },
   ]
 
   function startEditing() {
@@ -100,6 +113,51 @@ export default function CaseDetail() {
   async function deleteDocument(docId: string) {
     await db.deleteDocument(docId)
     setDocuments((prev) => prev.filter((d) => d.id !== docId))
+  }
+
+  async function addNotice(n: Notice) {
+    await db.createNotice({ ...n, created_at: new Date().toISOString() })
+    setNotices((prev) => [n, ...prev])
+  }
+
+  async function updateNotice(n: Notice) {
+    await db.updateNotice(n)
+    setNotices((prev) => prev.map((x) => (x.id === n.id ? n : x)))
+  }
+
+  async function deleteNotice(noticeId: string) {
+    await db.deleteNotice(noticeId)
+    setNotices((prev) => prev.filter((n) => n.id !== noticeId))
+  }
+
+  async function addSummons(s: Summons) {
+    await db.createSummons({ ...s, created_at: new Date().toISOString() })
+    setSummons((prev) => [s, ...prev])
+  }
+
+  async function updateSummons(s: Summons) {
+    await db.updateSummons(s)
+    setSummons((prev) => prev.map((x) => (x.id === s.id ? s : x)))
+  }
+
+  async function deleteSummons(summonsId: string) {
+    await db.deleteSummons(summonsId)
+    setSummons((prev) => prev.filter((s) => s.id !== summonsId))
+  }
+
+  async function addOrderCopy(o: OrderCopyRequest) {
+    await db.createOrderCopy({ ...o, created_at: new Date().toISOString() })
+    setOrderCopies((prev) => [o, ...prev])
+  }
+
+  async function updateOrderCopy(o: OrderCopyRequest) {
+    await db.updateOrderCopy(o)
+    setOrderCopies((prev) => prev.map((x) => (x.id === o.id ? o : x)))
+  }
+
+  async function deleteOrderCopy(copyId: string) {
+    await db.deleteOrderCopy(copyId)
+    setOrderCopies((prev) => prev.filter((o) => o.id !== copyId))
   }
 
   async function handleExportPdf() {
@@ -396,6 +454,44 @@ export default function CaseDetail() {
             />
           </CardContent>
         </Card>
+      )}
+
+      {activeTab === 'clerical' && (
+        <div className="space-y-6">
+          <Card>
+            <CardContent className="p-5">
+              <ClericalNotices
+                caseId={caseData.id}
+                notices={notices}
+                onAdd={addNotice}
+                onUpdate={updateNotice}
+                onDelete={deleteNotice}
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-5">
+              <ClericalSummons
+                caseId={caseData.id}
+                summons={summons}
+                onAdd={addSummons}
+                onUpdate={updateSummons}
+                onDelete={deleteSummons}
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-5">
+              <ClericalOrderCopies
+                caseId={caseData.id}
+                orderCopies={orderCopies}
+                onAdd={addOrderCopy}
+                onUpdate={updateOrderCopy}
+                onDelete={deleteOrderCopy}
+              />
+            </CardContent>
+          </Card>
+        </div>
       )}
 
     </div>

@@ -11,6 +11,11 @@ import type {
   DashboardStats,
   TimeEntry,
   Task,
+  Notice,
+  Summons,
+  OrderCopyRequest,
+  PersonalNote,
+  LegalReference,
 } from '@/types'
 
 const PREFIX = 'ld:'
@@ -342,6 +347,205 @@ export const localDb = {
     saveCollection('tasks', all.filter(t => t.id !== id))
   },
 
+  // ===== Personal Notes =====
+
+  async getPersonalNotes(category?: string): Promise<PersonalNote[]> {
+    const all = getCollection<PersonalNote>('personal_notes')
+    let filtered = all
+    if (category) filtered = all.filter((n) => n.category === category)
+    return filtered.sort((a, b) => {
+      if (a.pinned !== b.pinned) return a.pinned ? -1 : 1
+      return (b.updated_at || b.created_at || '').localeCompare(a.updated_at || a.created_at || '')
+    })
+  },
+
+  async getPersonalNote(id: string): Promise<PersonalNote | null> {
+    const all = getCollection<PersonalNote>('personal_notes')
+    return all.find((n) => n.id === id) ?? null
+  },
+
+  async searchPersonalNotes(query: string): Promise<PersonalNote[]> {
+    const all = getCollection<PersonalNote>('personal_notes')
+    const q = query.toLowerCase()
+    return all.filter(
+      (n) =>
+        n.title.toLowerCase().includes(q) ||
+        n.content.toLowerCase().includes(q) ||
+        (n.tags && n.tags.some((t) => t.toLowerCase().includes(q)))
+    )
+  },
+
+  async createPersonalNote(note: PersonalNote): Promise<string> {
+    const all = getCollection<PersonalNote>('personal_notes')
+    all.push(note)
+    saveCollection('personal_notes', all)
+    return note.id
+  },
+
+  async updatePersonalNote(note: PersonalNote): Promise<void> {
+    const all = getCollection<PersonalNote>('personal_notes')
+    const idx = all.findIndex((n) => n.id === note.id)
+    if (idx !== -1) {
+      all[idx] = { ...note, updated_at: new Date().toISOString() }
+      saveCollection('personal_notes', all)
+    }
+  },
+
+  async deletePersonalNote(id: string): Promise<void> {
+    const all = getCollection<PersonalNote>('personal_notes')
+    saveCollection('personal_notes', all.filter((n) => n.id !== id))
+  },
+
+  // ===== Legal References =====
+
+  async getLegalReferences(type?: string): Promise<LegalReference[]> {
+    const all = getCollection<LegalReference>('legal_references')
+    let filtered = all
+    if (type) filtered = all.filter((r) => r.reference_type === type)
+    return filtered.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
+  },
+
+  async getLegalReference(id: string): Promise<LegalReference | null> {
+    const all = getCollection<LegalReference>('legal_references')
+    return all.find((r) => r.id === id) ?? null
+  },
+
+  async searchLegalReferences(query: string): Promise<LegalReference[]> {
+    const all = getCollection<LegalReference>('legal_references')
+    const q = query.toLowerCase()
+    return all.filter(
+      (r) =>
+        r.title.toLowerCase().includes(q) ||
+        (r.description || '').toLowerCase().includes(q) ||
+        (r.content_text || '').toLowerCase().includes(q) ||
+        (r.jurisdiction || '').toLowerCase().includes(q) ||
+        (r.tags && r.tags.some((t) => t.toLowerCase().includes(q)))
+    )
+  },
+
+  async createLegalReference(ref: LegalReference): Promise<string> {
+    const all = getCollection<LegalReference>('legal_references')
+    all.push(ref)
+    saveCollection('legal_references', all)
+    return ref.id
+  },
+
+  async updateLegalReference(ref: LegalReference): Promise<void> {
+    const all = getCollection<LegalReference>('legal_references')
+    const idx = all.findIndex((r) => r.id === ref.id)
+    if (idx !== -1) {
+      all[idx] = { ...ref, updated_at: new Date().toISOString() }
+      saveCollection('legal_references', all)
+    }
+  },
+
+  async deleteLegalReference(id: string): Promise<void> {
+    const all = getCollection<LegalReference>('legal_references')
+    saveCollection('legal_references', all.filter((r) => r.id !== id))
+  },
+
+  // ===== Notices =====
+
+  async createNotice(data: Notice): Promise<string> {
+    const all = getCollection<Notice>('notices')
+    all.push(data)
+    saveCollection('notices', all)
+    return data.id
+  },
+
+  async getNotices(caseId: string): Promise<Notice[]> {
+    const all = getCollection<Notice>('notices')
+    return all
+      .filter((n) => n.case_id === caseId)
+      .sort((a, b) => (b.issued_date || '').localeCompare(a.issued_date || ''))
+  },
+
+  async getAllNotices(): Promise<Notice[]> {
+    return getCollection<Notice>('notices')
+  },
+
+  async updateNotice(data: Notice): Promise<void> {
+    const all = getCollection<Notice>('notices')
+    const idx = all.findIndex((n) => n.id === data.id)
+    if (idx !== -1) {
+      all[idx] = { ...data, updated_at: new Date().toISOString() }
+      saveCollection('notices', all)
+    }
+  },
+
+  async deleteNotice(id: string): Promise<void> {
+    const all = getCollection<Notice>('notices')
+    saveCollection('notices', all.filter((n) => n.id !== id))
+  },
+
+  // ===== Summons =====
+
+  async createSummons(data: Summons): Promise<string> {
+    const all = getCollection<Summons>('summons')
+    all.push(data)
+    saveCollection('summons', all)
+    return data.id
+  },
+
+  async getSummons(caseId: string): Promise<Summons[]> {
+    const all = getCollection<Summons>('summons')
+    return all
+      .filter((s) => s.case_id === caseId)
+      .sort((a, b) => (b.issued_date || '').localeCompare(a.issued_date || ''))
+  },
+
+  async getAllSummons(): Promise<Summons[]> {
+    return getCollection<Summons>('summons')
+  },
+
+  async updateSummons(data: Summons): Promise<void> {
+    const all = getCollection<Summons>('summons')
+    const idx = all.findIndex((s) => s.id === data.id)
+    if (idx !== -1) {
+      all[idx] = { ...data, updated_at: new Date().toISOString() }
+      saveCollection('summons', all)
+    }
+  },
+
+  async deleteSummons(id: string): Promise<void> {
+    const all = getCollection<Summons>('summons')
+    saveCollection('summons', all.filter((s) => s.id !== id))
+  },
+
+  // ===== Order Copy Requests =====
+
+  async createOrderCopy(data: OrderCopyRequest): Promise<string> {
+    const all = getCollection<OrderCopyRequest>('order_copies')
+    all.push(data)
+    saveCollection('order_copies', all)
+    return data.id
+  },
+
+  async getOrderCopies(caseId: string): Promise<OrderCopyRequest[]> {
+    const all = getCollection<OrderCopyRequest>('order_copies')
+    return all
+      .filter((o) => o.case_id === caseId)
+      .sort((a, b) => (b.applied_date || '').localeCompare(a.applied_date || ''))
+  },
+
+  async getAllOrderCopies(): Promise<OrderCopyRequest[]> {
+    return getCollection<OrderCopyRequest>('order_copies')
+  },
+
+  async updateOrderCopy(data: OrderCopyRequest): Promise<void> {
+    const all = getCollection<OrderCopyRequest>('order_copies')
+    const idx = all.findIndex((o) => o.id === data.id)
+    if (idx !== -1) {
+      all[idx] = { ...data, updated_at: new Date().toISOString() }
+      saveCollection('order_copies', all)
+    }
+  },
+
+  async deleteOrderCopy(id: string): Promise<void> {
+    const all = getCollection<OrderCopyRequest>('order_copies')
+    saveCollection('order_copies', all.filter((o) => o.id !== id))
+  },
+
   // ===== Batch Replace (for cloud sync) =====
 
   replaceCases(cases: Case[]): void { saveCollection('cases', cases) },
@@ -352,6 +556,11 @@ export const localDb = {
   replaceDocuments(docs: Document[]): void { saveCollection('documents', docs) },
   replaceTimeEntries(entries: TimeEntry[]): void { saveCollection('time_entries', entries) },
   replaceTasks(tasks: Task[]): void { saveCollection('tasks', tasks) },
+  replacePersonalNotes(notes: PersonalNote[]): void { saveCollection('personal_notes', notes) },
+  replaceNotices(notices: Notice[]): void { saveCollection('notices', notices) },
+  replaceSummons(summons: Summons[]): void { saveCollection('summons', summons) },
+  replaceOrderCopies(copies: OrderCopyRequest[]): void { saveCollection('order_copies', copies) },
+  replaceLegalReferences(refs: LegalReference[]): void { saveCollection('legal_references', refs) },
 
   replaceAll(data: {
     cases?: Case[]
@@ -362,6 +571,11 @@ export const localDb = {
     documents?: Document[]
     time_entries?: TimeEntry[]
     tasks?: Task[]
+    personal_notes?: PersonalNote[]
+    notices?: Notice[]
+    summons?: Summons[]
+    order_copies?: OrderCopyRequest[]
+    legal_references?: LegalReference[]
   }): void {
     if (data.cases) this.replaceCases(data.cases)
     if (data.clients) this.replaceClients(data.clients)
@@ -371,6 +585,11 @@ export const localDb = {
     if (data.documents) this.replaceDocuments(data.documents)
     if (data.time_entries) this.replaceTimeEntries(data.time_entries)
     if (data.tasks) this.replaceTasks(data.tasks)
+    if (data.personal_notes) this.replacePersonalNotes(data.personal_notes)
+    if (data.notices) this.replaceNotices(data.notices)
+    if (data.summons) this.replaceSummons(data.summons)
+    if (data.order_copies) this.replaceOrderCopies(data.order_copies)
+    if (data.legal_references) this.replaceLegalReferences(data.legal_references)
   },
 
   // ===== Dashboard =====
