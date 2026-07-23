@@ -15,16 +15,24 @@ export function AdBanner({ adKey, format = 'iframe', height = 250, width = 300, 
 
   useEffect(() => {
     if (!ADSTERRA_BASE || !adKey || !containerRef.current) return
-    if (containerRef.current.firstChild) return
+    if (containerRef.current.dataset.initialized) return
+    containerRef.current.dataset.initialized = 'true'
 
     const atOptions = { key: adKey, format, height, width, params: {} }
 
     const conf = document.createElement('script')
-    conf.innerHTML = `atOptions = ${JSON.stringify(atOptions)}`
+    conf.textContent = `window.atOptions = ${JSON.stringify(atOptions)}`
 
     const script = document.createElement('script')
     script.type = 'text/javascript'
     script.src = `//${ADSTERRA_BASE}/${adKey}/invoke.js`
+    script.onerror = () => {
+      containerRef.current!.innerHTML = ''
+      const fallback = document.createElement('div')
+      fallback.className = 'flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-white/50 p-3 text-center text-xs text-slate-400'
+      fallback.innerHTML = '<p class="font-medium text-slate-300">Advertisement</p><p class="mt-0.5">Loading...</p>'
+      containerRef.current!.appendChild(fallback)
+    }
 
     containerRef.current.appendChild(conf)
     containerRef.current.appendChild(script)

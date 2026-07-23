@@ -71,7 +71,7 @@ export function ReferenceForm({ open, onClose, onSave, editRef }: ReferenceFormP
             label="Type"
             options={REFERENCE_TYPES.map(t => ({ value: t, label: t }))}
             value={referenceType}
-            onChange={(e) => setReferenceType(e.target.value)}
+            onChange={(e) => setReferenceType(e.target.value as typeof referenceType)}
           />
           <Input
             label="Year"
