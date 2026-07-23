@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { FAQSection } from '@/components/FAQSection'
 import { FAQ_DATA } from '@/data/faq'
 import { ArrowLeft, HelpCircle } from 'lucide-react'
+import { AdBanner } from '@/components/ads/AdBanner'
 
 export default function FAQ() {
   const navigate = useNavigate()
@@ -27,6 +28,10 @@ export default function FAQ() {
         </div>
 
         <FAQSection items={FAQ_DATA} />
+
+        <div className="my-6 flex justify-center">
+          <AdBanner adKey="xpdt49gn" height={90} width={728} />
+        </div>
 
         <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm">
           <p className="text-sm text-slate-600">

@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { Scale, ArrowLeft } from 'lucide-react'
+import { AdBanner } from '@/components/ads/AdBanner'
 
 export default function Legal() {
   const navigate = useNavigate()
@@ -150,6 +151,10 @@ export default function Legal() {
             </p>
           </div>
         </section>
+
+        <div className="my-8 flex justify-center">
+          <AdBanner adKey="xpdt49gn" height={90} width={728} />
+        </div>
 
         <div className="border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
           <p className="mb-2">

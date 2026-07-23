@@ -1,6 +1,7 @@
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { GUIDES } from '@/data/guides'
 import { ArrowLeft, BookOpen, Clock, Calendar } from 'lucide-react'
+import { AdBanner } from '@/components/ads/AdBanner'
 
 export default function GuideDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -108,6 +109,10 @@ export default function GuideDetail() {
             </div>
           </div>
         </article>
+
+        <div className="my-8 flex justify-center">
+          <AdBanner adKey="xpdt49gn" height={90} width={728} />
+        </div>
 
         {related.length > 0 && (
           <div className="mt-12 border-t border-slate-200 pt-8">

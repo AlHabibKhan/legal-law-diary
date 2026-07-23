@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { GUIDES } from '@/data/guides'
 import { ArrowLeft, BookOpen, Clock, Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { AdBanner } from '@/components/ads/AdBanner'
 
 const CATEGORIES = ['All', ...new Set(GUIDES.map(g => g.category))]
 
@@ -69,6 +70,10 @@ export default function Guides() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="my-6 flex justify-center">
+          <AdBanner adKey="xpdt49gn" height={90} width={728} />
         </div>
 
         {filtered.length === 0 ? (
