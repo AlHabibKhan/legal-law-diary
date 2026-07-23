@@ -18,6 +18,8 @@ export function AdBanner({ adKey, format = 'iframe', height = 250, width = 300, 
     if (containerRef.current.dataset.initialized) return
     containerRef.current.dataset.initialized = 'true'
 
+    const container = containerRef.current
+
     const atOptions = { key: adKey, format, height, width, params: {} }
 
     const conf = document.createElement('script')
@@ -26,16 +28,37 @@ export function AdBanner({ adKey, format = 'iframe', height = 250, width = 300, 
     const script = document.createElement('script')
     script.type = 'text/javascript'
     script.src = `//${ADSTERRA_BASE}/${adKey}/invoke.js`
-    script.onerror = () => {
-      containerRef.current!.innerHTML = ''
-      const fallback = document.createElement('div')
-      fallback.className = 'flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-white/50 p-3 text-center text-xs text-slate-400'
-      fallback.innerHTML = '<p class="font-medium text-slate-300">Advertisement</p><p class="mt-0.5">Loading...</p>'
-      containerRef.current!.appendChild(fallback)
+
+    let adHtml = ''
+    const origWrite = document.write.bind(document)
+    const origWriteln = document.writeln.bind(document)
+    document.write = (str: string) => { adHtml += str }
+    document.writeln = (str: string) => { adHtml += str + '\n' }
+
+    const restore = () => {
+      document.write = origWrite
+      document.writeln = origWriteln
     }
 
-    containerRef.current.appendChild(conf)
-    containerRef.current.appendChild(script)
+    const done = () => {
+      restore()
+      if (!adHtml) {
+        const fallback = document.createElement('div')
+        fallback.className = 'flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-white/50 p-3 text-center text-xs text-slate-400'
+        fallback.innerHTML = '<p class="font-medium text-slate-300">Advertisement</p><p class="mt-0.5">Loading...</p>'
+        container.appendChild(fallback)
+        return
+      }
+      container.innerHTML = adHtml
+    }
+
+    script.onload = done
+    script.onerror = done
+
+    container.appendChild(conf)
+    container.appendChild(script)
+
+    setTimeout(done, 3000)
   }, [adKey, format, height, width])
 
   if (!ADSTERRA_BASE) {

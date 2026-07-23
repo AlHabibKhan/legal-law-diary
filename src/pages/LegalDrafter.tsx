@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { supabaseDb } from '@/lib/db-supabase'
 import type { PaymentMethod, SubscriptionPlan } from '@/types'
 import { ArrowLeft, Loader2, CheckCircle, Copy, FileText } from 'lucide-react'
+import { AdBanner } from '@/components/ads/AdBanner'
 
 // ── Pakistani legal case types ──────────────────────────────────────────────
 const CASE_TYPES = [
@@ -325,6 +326,11 @@ export default function LegalDrafter() {
             )}
           </div>
         ))}
+      </div>
+
+      {/* Top Ad Banner */}
+      <div className="flex justify-center py-3" style={{ background: "#0a1f35", borderBottom: "1px solid #1e3d5c" }}>
+        <AdBanner adKey="xpdt49gn" height={90} width={728} />
       </div>
 
       {/* Main Content */}
@@ -838,6 +844,11 @@ export default function LegalDrafter() {
             </button>
           </div>
         )}
+
+        {/* Bottom Ad Banner */}
+        <div className="flex justify-center pt-6" style={{ borderTop: "1px solid #1e3d5c", marginTop: "32px" }}>
+          <AdBanner adKey="xpdt49gn" height={250} width={300} />
+        </div>
       </div>
     </div>
   )
